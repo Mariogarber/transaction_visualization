@@ -5,3 +5,4 @@ plotly
 dash
 folium
 matplotlib
+gunicorn

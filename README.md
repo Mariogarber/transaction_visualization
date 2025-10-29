@@ -1,12 +1,12 @@
-# transaction_visualization
+
+
+# Transaction Visualization
 
 To build the docker image execute:
 `docker build -t dashboard .`
 
 To execute the docker image use:
 `docker run -d -p 8080:8080 --name dashboard dashboard`
-
-# Transaction Visualization
 
 ## Overview
 
@@ -15,7 +15,6 @@ It enables exploration of temporal and categorical patterns, filtering, and gene
 
 The project includes:
 
-- A **Jupyter notebook** for exploratory analysis (`visualization.ipynb`)
 - A **main dashboard script** (`dashboard.py`)
 - **Utility functions** organized under the `functions/` directory
 - **Example data** stored in `data/`

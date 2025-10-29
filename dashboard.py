@@ -3,6 +3,8 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 import pandas as pd
 
+import os
+
 from functions.layout import create_layout_v2
 from functions.data_processing import DataProcessor
 from functions.graph import make_info_folium_map, make_transaction_arrow_map, make_stacked_illegal_legal, make_transaction_over_time
@@ -65,4 +67,5 @@ def update_transaction_information(selected_industries, country_selected, window
     return fig
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
