@@ -97,7 +97,7 @@ class DataManager:
     def set_arrow_data(self):
         # Obtenemos coordenadas (lat/lon) a partir del punto representativo
         transaction = self.merge_data
-        transaction_info = transaction[['iso_a3', 'rep_point', 'Destination Country', 'Amount (USD)']].drop_duplicates()
+        transaction_info = transaction[['iso_a3', 'rep_point', 'Destination Country', 'Amount (USD)', 'Date']].drop_duplicates()
 
         transaction_info['rep_point_origin'] = transaction_info['rep_point']
         transaction_info['rep_point_destination'] = transaction_info['Destination Country'].map(self.geodata.set_index('admin')['rep_point'])
