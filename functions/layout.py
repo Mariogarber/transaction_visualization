@@ -55,23 +55,23 @@ from dash import dcc, html
 
 def create_layout_v2(data):
     layout = html.Div([
-        html.H1("Dashboard de Análisis de Transacciones", style={'textAlign': 'center', 'marginBottom': '30px'}),
+        html.H1("Money Transactions Analytics Dashboard", style={'textAlign': 'center', 'marginBottom': '30px'}),
 
         # ===============================
-        # SECCIÓN: ANÁLISIS GEOGRÁFICO
+        # SECTION: GEOGRAPHICAL ANALYSIS
         # ===============================
         html.Div([
-            html.H2("Análisis Geográfico", style={'marginBottom': '20px'}),
+            html.H2("Geographical Analysis", style={'marginBottom': '20px'}),
 
 
             html.Div([
-                html.H3("Mapa de Transacciones Reportadas"),
+                html.H3("Reported Transactions Map"),
                 html.Iframe(id='reported-map', style={'width': '100%', 'height': '500px', 'border': '1px solid #ccc', 'borderRadius': '8px'}),
             ], style={'marginBottom': '40px'}),
 
             html.Div([
                 html.Div([
-                    html.Label("📅 Fecha:", style={'fontWeight': 'bold'}),
+                    html.Label("📅 Date:", style={'fontWeight': 'bold'}),
                     dcc.DatePickerSingle(
                         id='date-picker',
                         date=data['Date'].min(),
@@ -83,12 +83,12 @@ def create_layout_v2(data):
                 ], style={'width': '20%', 'display': 'inline-block', 'verticalAlign': 'top', 'paddingRight': '20px'}),
 
                 html.Div([
-                    html.Label("Tipo de Transacción:", style={'fontWeight': 'bold'}),
+                    html.Label("Transaction Type:", style={'fontWeight': 'bold'}),
                     dcc.Checklist(
                         id='transaction-checklist',
                         options=[
-                            {'label': 'Origen', 'value': 'origin'},
-                            {'label': 'Destino', 'value': 'destiny'}
+                            {'label': 'Origin', 'value': 'origin'},
+                            {'label': 'Destination', 'value': 'destiny'}
                         ],
                         value=['origin', 'destiny'],
                         inline=True,
@@ -110,7 +110,7 @@ def create_layout_v2(data):
             ], style={'marginBottom': '20px'}),
 
             html.Div([
-                html.H3("Flujos de Transacciones (Origen/Destino)"),
+                html.H3("Transaction Flux Map (Origin & Destination)"),
                 dcc.Graph(id='transaction-arrow-map', style={'width': '100%', 'height': '400px'})
             ])
         ], style={
@@ -122,14 +122,14 @@ def create_layout_v2(data):
         }),
 
         # ===============================
-        # SECCIÓN: ANÁLISIS INDUSTRIAL
+        # SECTION: INDUSTRIAL ANALYSIS
         # ===============================
         html.Div([
-            html.H2("Análisis Industrial", style={'marginBottom': '20px'}),
+            html.H2("Industrial Analysis", style={'marginBottom': '20px'}),
 
             html.Div([
                 html.Div([
-                    html.Label("País:", style={'fontWeight': 'bold'}),
+                    html.Label("Country:", style={'fontWeight': 'bold'}),
                     dcc.Dropdown(
                         id='country-dropdown',
                         options=[{'label': country, 'value': country} for country in data['Country'].unique()],
@@ -140,19 +140,19 @@ def create_layout_v2(data):
                 ], style={'width': '30%', 'display': 'inline-block', 'paddingRight': '20px'}),
 
                 html.Div([
-                    html.Button('🔄 Normalizar', id='normalize-button', n_clicks=0,
+                    html.Button('🔄 Normalize', id='normalize-button', n_clicks=0,
                                 style={'marginTop': '25px', 'width': '150px', 'height': '40px', 'borderRadius': '8px'})
                 ], style={'display': 'inline-block', 'verticalAlign': 'top'}),
             ], style={'marginBottom': '30px'}),
 
             html.Div([
-                html.H3("Distribución de Transacciones por Industria"),
+                html.H3("Transaction Distribution by Industry"),
                 dcc.Graph(id='industry-bar-chart', style={'width': '100%', 'height': '400px'})
             ], style={'marginBottom': '40px'}),
 
             html.Div([
                 html.Div([
-                    html.Label("Selección de Industria:", style={'fontWeight': 'bold'}),
+                    html.Label("Industry Selection:", style={'fontWeight': 'bold'}),
                     dcc.Dropdown(
                         id='industry-dropdown',
                         options=[{'label': industry, 'value': industry} for industry in data['Industry'].unique()],
@@ -164,7 +164,7 @@ def create_layout_v2(data):
                 ], style={'width': '45%', 'display': 'inline-block', 'paddingRight': '20px'}),
 
                 html.Div([
-                    html.Label("Selección de País:", style={'fontWeight': 'bold'}),
+                    html.Label("Country Selection:", style={'fontWeight': 'bold'}),
                     dcc.Dropdown(
                         id='country-dropdown-multi',
                         options=[{'label': country, 'value': country} for country in data['Country'].unique()],
