@@ -63,19 +63,19 @@ def get_color(amount, min_amt, max_amt):
 
 # Folium map with pie charts and bar charts as popups on country centroids
 
-def make_info_folium_map(dataset, geo_data, iso_a3_dict):
-    clean_data = dataset[['Country', 'Reported by Authority', 'Source of Money', 'Amount (USD)', 'Transaction Type']]
-    clean_data_illegal = clean_data[clean_data['Source of Money'] == 'Illegal']
-    data_country = clean_data_illegal.groupby('Country')
-    map_illegal_data = {}
-    map_transactions_data = {}
-    for country, group in data_country:
-        illegal_count = group['Reported by Authority'].sum()
-        illegal_total = len(group)
-        map_illegal_data[country] = illegal_count / illegal_total if illegal_total > 0 else 0
+def make_info_folium_map(clean_data_illegal, geo_data, map_illegal_data, map_transactions_data):
+    # clean_data = dataset[['Country', 'Reported by Authority', 'Source of Money', 'Amount (USD)', 'Transaction Type']]
+    # clean_data_illegal = clean_data[clean_data['Source of Money'] == 'Illegal']
+    # data_country = clean_data_illegal.groupby('Country')
+    # map_illegal_data = {}
+    # map_transactions_data = {}
+    # for country, group in data_country:
+    #     illegal_count = group['Reported by Authority'].sum()
+    #     illegal_total = len(group)
+    #     map_illegal_data[country] = illegal_count / illegal_total if illegal_total > 0 else 0
 
-        transaction_counts = group['Transaction Type'].value_counts().to_dict()
-        map_transactions_data[country] = transaction_counts
+    #     transaction_counts = group['Transaction Type'].value_counts().to_dict()
+    #     map_transactions_data[country] = transaction_counts
 
     map = folium.Map(location=[20, 0], zoom_start=2)
 
@@ -144,8 +144,8 @@ def make_info_folium_map(dataset, geo_data, iso_a3_dict):
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_visible(False)
-        # ax.set_xticklabels(map_transactions_data[country].keys(), rotation=45, fontsize=8)
         ax.set_title(f"Transactions in {country}", fontsize=8)
+        ax.set_xticklabels(map_transactions_data[country].keys(), rotation=45, fontsize=8)
 
         buf = io.BytesIO()
         fig.savefig(buf, format='png', bbox_inches='tight')  # guarda como PNG in-memory
@@ -176,50 +176,50 @@ def make_info_folium_map(dataset, geo_data, iso_a3_dict):
 
 # Map with arrows showing transactions between countries
 
-def make_transaction_arrow_map(df, gdf_countries, iso_a3_dict, selected_date, arrow_options=['origin', 'destiny'], country='ALL'):
+def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_amt, max_amt, show_arrows):
     # Filtramos por la fecha seleccionada
-    selected_date = pd.to_datetime(selected_date).date()
-    transaction = df[df['Date'] == selected_date]
+    # selected_date = pd.to_datetime(selected_date).date()
+    # transaction = df[df['Date'] == selected_date]
 
-    if country != 'ALL':
-        transaction = transaction[(transaction['Country'] == country) | (transaction['Destination Country'] == country)]
-        if 'origin' in arrow_options and 'destiny' not in arrow_options:
-            transaction = transaction[transaction['Country'] == country]
-        elif 'destiny' in arrow_options and 'origin' not in arrow_options:
-            transaction = transaction[transaction['Destination Country'] == country]
-        else:
-            transaction = transaction[(transaction['Country'] == country) | (transaction['Destination Country'] == country)]
+    # if country != 'ALL':
+    #     transaction = transaction[(transaction['Country'] == country) | (transaction['Destination Country'] == country)]
+    #     if 'origin' in arrow_options and 'destiny' not in arrow_options:
+    #         transaction = transaction[transaction['Country'] == country]
+    #     elif 'destiny' in arrow_options and 'origin' not in arrow_options:
+    #         transaction = transaction[transaction['Destination Country'] == country]
+    #     else:
+    #         transaction = transaction[(transaction['Country'] == country) | (transaction['Destination Country'] == country)]
 
-    # Obtenemos coordenadas (lat/lon) a partir del punto representativo
-    transaction_info = transaction[['iso_a3', 'rep_point', 'Destination Country', 'Amount (USD)']].drop_duplicates()
+    # # Obtenemos coordenadas (lat/lon) a partir del punto representativo
+    # transaction_info = transaction[['iso_a3', 'rep_point', 'Destination Country', 'Amount (USD)']].drop_duplicates()
 
-    transaction_info['rep_point_origin'] = transaction_info['rep_point']
-    transaction_info['rep_point_destination'] = transaction_info['Destination Country'].map(gdf_countries.set_index('admin')['rep_point'])
+    # transaction_info['rep_point_origin'] = transaction_info['rep_point']
+    # transaction_info['rep_point_destination'] = transaction_info['Destination Country'].map(gdf_countries.set_index('admin')['rep_point'])
 
-    transaction_info['o_lat'] = transaction_info['rep_point_origin'].apply(lambda point: point.y)
-    transaction_info['o_lon'] = transaction_info['rep_point_origin'].apply(lambda point: point.x)
-    transaction_info['d_lat'] = transaction_info['rep_point_destination'].apply(lambda point: point.y)
-    transaction_info['d_lon'] = transaction_info['rep_point_destination'].apply(lambda point: point.x)
+    # transaction_info['o_lat'] = transaction_info['rep_point_origin'].apply(lambda point: point.y)
+    # transaction_info['o_lon'] = transaction_info['rep_point_origin'].apply(lambda point: point.x)
+    # transaction_info['d_lat'] = transaction_info['rep_point_destination'].apply(lambda point: point.y)
+    # transaction_info['d_lon'] = transaction_info['rep_point_destination'].apply(lambda point: point.x)
 
-    transaction_info['iso_a3_dest'] = transaction_info['Destination Country'].map(iso_a3_dict)
+    # transaction_info['iso_a3_dest'] = transaction_info['Destination Country'].map(iso_a3_dict)
 
-    # obtain origin and destination coordinates
-    flows_df = pd.DataFrame(transaction_info)
-    flows = flows_df.rename(columns={'Amount (USD)': 'amount', 'iso_a3': 'origin_iso_a3', 'iso_a3_dest': 'dest_iso_a3'})
+    # # obtain origin and destination coordinates
+    # flows_df = pd.DataFrame(transaction_info)
+    # flows = flows_df.rename(columns={'Amount (USD)': 'amount', 'iso_a3': 'origin_iso_a3', 'iso_a3_dest': 'dest_iso_a3'})
 
-    show_arrows = True
-    if 'origin' in arrow_options and 'destiny' in arrow_options:
-        total_received = flows.groupby('dest_iso_a3')['amount'].sum()
-        total_sent = flows.groupby('origin_iso_a3')['amount'].sum() * -1
-        total = total_received.add(total_sent, fill_value=0)
-    elif 'origin' in arrow_options:
-        total = flows.groupby('origin_iso_a3')['amount'].sum() * -1
-    elif 'destiny' in arrow_options:
-        total = flows.groupby('dest_iso_a3')['amount'].sum()
-    else:
-        total = pd.Series(np.zeros(len(gdf_countries)), index=gdf_countries['iso_a3'])
-        show_arrows = False
-    min_amt, max_amt = total.min(), total.max()
+    # show_arrows = True
+    # if 'origin' in arrow_options and 'destiny' in arrow_options:
+    #     total_received = flows.groupby('dest_iso_a3')['amount'].sum()
+    #     total_sent = flows.groupby('origin_iso_a3')['amount'].sum() * -1
+    #     total = total_received.add(total_sent, fill_value=0)
+    # elif 'origin' in arrow_options:
+    #     total = flows.groupby('origin_iso_a3')['amount'].sum() * -1
+    # elif 'destiny' in arrow_options:
+    #     total = flows.groupby('dest_iso_a3')['amount'].sum()
+    # else:
+    #     total = pd.Series(np.zeros(len(gdf_countries)), index=gdf_countries['iso_a3'])
+    #     show_arrows = False
+    # min_amt, max_amt = total.min(), total.max()
     fig = go.Figure()
     # Color each country based on the total amount received
     amount_colors = {}
@@ -348,6 +348,7 @@ def make_stacked_illegal_legal(selected_country, normalize_clicks, dataset):
         rows=1, cols=2, subplot_titles=['Transaction Count', 'Amount (Millions USD)'],
         shared_yaxes=False
     )
+
     suffix = ""
     if normalize_clicks % 2 == 1:
         suffix = " (Normalized)"
@@ -420,7 +421,7 @@ def make_stacked_illegal_legal(selected_country, normalize_clicks, dataset):
 
     fig.update_layout(
         title='Transaction Overview by Industry',
-        template='simple_white',
+        template='plotly_white',
         legend_title_text='Source of Money',
         barmode='stack'
     )

@@ -6,13 +6,18 @@ import pandas as pd
 import os
 
 from functions.layout import create_layout_v2
-from functions.data_processing import DataProcessor
+from functions.data_processing import DataManager
 from functions.graph import make_info_folium_map, make_transaction_arrow_map, make_stacked_illegal_legal, make_transaction_over_time
 
-data_processor = DataProcessor()
-data = data_processor.get_data()
-gdf = data_processor.geodata
-iso_a3= data_processor.iso_a3_dict
+DATA_PROCESSOR = DataManager()
+data = DATA_PROCESSOR.get_data()
+gdf = DATA_PROCESSOR.geodata
+iso_a3= DATA_PROCESSOR.iso_a3_dict
+
+FOLIUM_MAP_INFO = DATA_PROCESSOR.set_folium_data()
+_ = DATA_PROCESSOR.set_arrow_data()
+
+MIN_DATE = data['Date'].min()
 
 app = dash.Dash(__name__)
 app.layout = create_layout_v2(data)
@@ -21,8 +26,8 @@ app.layout = create_layout_v2(data)
     Output('reported-map', 'srcDoc'),
     Input('reported-map', 'id')  # Dummy input to trigger the callback once
 )
-def update_folium_map(_, dataset=data, gdf=gdf, iso_a3=iso_a3):
-    folium_map = make_info_folium_map(dataset, gdf, iso_a3)
+def update_folium_map(_):
+    folium_map = make_info_folium_map(**FOLIUM_MAP_INFO)
     return folium_map
 
 @app.callback(
@@ -31,13 +36,12 @@ def update_folium_map(_, dataset=data, gdf=gdf, iso_a3=iso_a3):
     Input('transaction-checklist', 'value'),
     Input('country-selector', 'value')
 )
-def update_arrow_map(selected_date, arrow_options, selected_country, dataset=data, gdf=gdf, iso_a3=iso_a3):
+def update_arrow_map(selected_date, arrow_options, selected_country):
     selected_date = pd.to_datetime(selected_date).date()
-    if selected_date is None or selected_date < dataset['Date'].min() or selected_date > dataset['Date'].max():
-        selected_date = dataset['Date'].min()
-    fig, _ = make_transaction_arrow_map(df=dataset, gdf_countries=gdf, iso_a3_dict=iso_a3,
-                                            selected_date=selected_date, arrow_options=arrow_options,
-                                            country=selected_country)
+    if selected_date is None or selected_date < MIN_DATE:
+        selected_date = MIN_DATE
+    flows_info = DATA_PROCESSOR.filter_flows(arrow_options, selected_country, selected_date)
+    fig, _ = make_transaction_arrow_map(**flows_info)
     return fig
 
 @app.callback(
