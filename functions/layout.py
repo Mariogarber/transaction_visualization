@@ -1,4 +1,5 @@
 from dash import dcc, html
+from dash.dcc import Loading
 
 def create_layout(data):
     layout = html.Div([
@@ -25,7 +26,13 @@ def create_layout(data):
             value='ALL',
             clearable=False
         ),
-        dcc.Graph(id='transaction-arrow-map', style={'width': '100%', 'height': '400px'}),
+        Loading(
+            id='loading-arrow-map',
+            children=dcc.Graph(id='transaction-arrow-map', style={'width': '100%', 'height': '400px'}),
+            type='graph',
+            color="#8afa7c",
+            fullscreen=False
+        ),
         dcc.Dropdown(
             id='country-dropdown',
             options=[{'label': country, 'value': country} for country in data['Country'].unique()],
@@ -33,7 +40,13 @@ def create_layout(data):
             clearable=False
         ),
         html.Button('Normalize', id='normalize-button', n_clicks=0, style={'margin': '10px'}),
-        dcc.Graph(id='industry-bar-chart'),
+        Loading(
+            id='loading-industry-bar-chart',
+            children=dcc.Graph(id='industry-bar-chart'),
+            type='graph',
+            fullscreen=False,
+            color="#ffcc00",
+            ),
         #dropdown by industry
         dcc.Dropdown(id='industry-dropdown',
             options=[{'label': industry, 'value': industry} for industry in data['Industry'].unique()],
@@ -47,7 +60,14 @@ def create_layout(data):
             multi=True,
             clearable=False
         ),
-        dcc.Graph(id='transactions-over-time', style={'width': '100%', 'height': '600px'})
+        Loading(
+            id='loading-transaction-over-time',
+            children=dcc.Graph(id='transactions-over-time', style={'width': '100%', 'height': '600px'}),
+            type='graph',
+            fullscreen=False,
+            color="#ff5733",
+            style={'marginBottom': '50px'}
+        )
 ])
     return layout
 
