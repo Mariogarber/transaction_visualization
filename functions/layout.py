@@ -1,5 +1,4 @@
 from dash import dcc, html
-from dash.dcc import Loading
 
 def create_layout(data):
     layout = html.Div([
@@ -26,7 +25,7 @@ def create_layout(data):
             value='ALL',
             clearable=False
         ),
-        Loading(
+        dcc.Loading(
             id='loading-arrow-map',
             children=dcc.Graph(id='transaction-arrow-map', style={'width': '100%', 'height': '400px'}),
             type='graph',
@@ -40,7 +39,7 @@ def create_layout(data):
             clearable=False
         ),
         html.Button('Normalize', id='normalize-button', n_clicks=0, style={'margin': '10px'}),
-        Loading(
+        dcc.Loading(
             id='loading-industry-bar-chart',
             children=dcc.Graph(id='industry-bar-chart'),
             type='graph',
@@ -60,7 +59,7 @@ def create_layout(data):
             multi=True,
             clearable=False
         ),
-        Loading(
+        dcc.Loading(
             id='loading-transaction-over-time',
             children=dcc.Graph(id='transactions-over-time', style={'width': '100%', 'height': '600px'}),
             type='graph',
@@ -70,8 +69,6 @@ def create_layout(data):
         )
 ])
     return layout
-
-from dash import dcc, html
 
 def create_layout_v2(data):
     layout = html.Div([
@@ -131,7 +128,13 @@ def create_layout_v2(data):
 
             html.Div([
                 html.H3("Transaction Flux Map (Origin & Destination)"),
-                dcc.Graph(id='transaction-arrow-map', style={'width': '100%', 'height': '400px'})
+                dcc.Loading(
+                    id='loading-arrow-map',
+                    children=dcc.Graph(id='transaction-arrow-map', style={'width': '100%', 'height': '400px'}),
+                    type='graph',
+                    color="#8afa7c",
+                    fullscreen=False
+                )
             ])
         ], style={
             'border': '1px solid #d9d9d9',
@@ -167,7 +170,12 @@ def create_layout_v2(data):
 
             html.Div([
                 html.H3("Transaction Distribution by Industry"),
-                dcc.Graph(id='industry-bar-chart', style={'width': '100%', 'height': '400px'})
+                dcc.Loading(
+                    id='loading-industry-bar-chart',
+                    children=dcc.Graph(id='industry-bar-chart', style={'width': '100%', 'height': '400px'}),
+                    type='graph',
+                    fullscreen=False
+                )
             ], style={'marginBottom': '40px'}),
 
             html.Div([
@@ -209,7 +217,14 @@ def create_layout_v2(data):
                     tooltip={"placement": "bottom", "always_visible": True},
                     updatemode='drag'
                 ),
-                dcc.Graph(id='transactions-over-time', style={'width': '100%', 'height': '600px'})
+                dcc.Loading(
+                    id='loading-transaction-over-time',
+                    children=dcc.Graph(id='transactions-over-time', style={'width': '100%', 'height': '600px'}),
+                    type='graph',
+                    fullscreen=False,
+                    color="#ff5733",
+                    style={'marginTop': '20px'}
+                )
             ])
         ], style={
             'border': '1px solid #d9d9d9',
