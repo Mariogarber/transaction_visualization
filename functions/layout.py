@@ -1,4 +1,5 @@
 from dash import dcc, html
+import dash_bootstrap_components as dbc
 
 def create_layout(data):
     layout = html.Div([
@@ -73,6 +74,65 @@ def create_layout(data):
 def create_layout_v2(data):
     layout = html.Div([
         html.H1("Money Transactions Analytics Dashboard", style={'textAlign': 'center', 'marginBottom': '30px'}),
+        
+        # ==================================
+        # SECTION: STATISTICAL CARD OVERVIEW
+        # ==================================
+        html.Div([
+            html.H2("Statistical Overview", style={'marginBottom': '20px'}),
+            html.Div([
+                html.Div([
+                    dcc.DatePickerRange(
+                        id='date-range-picker',
+                        start_date=data['Date'].min(),
+                        end_date=data['Date'].max(),
+                        display_format='YYYY-MM-DD',
+                        style={'marginRight': '20px'}
+                    ),
+                    dcc.Dropdown(
+                        id='country-dropdown-overview',
+                        options=[{'label': c, 'value': c} for c in data['Country'].unique()],
+                        value=list(data['Country'].unique()),
+                        clearable=False,
+                        style={'width': '80%', 'display': 'inline-block'},
+                        multi=True
+                    )
+                ], style={'display': 'flex', 'alignItems': 'center'}),
+
+                # Add here more cards if needed
+                dbc.Row([
+                    dbc.Col(dbc.Card([
+                        dbc.CardBody([
+                            html.Div([
+                                html.Div([
+                                    html.H4("Total Transactions", className="card-title"),
+                                    html.H2(id='total-transactions', className="card-text"),
+                                ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
+                                html.Div([
+                                    html.H4("Total Inversion", className="card-title"),
+                                    html.H2(id='total-millions', className="card-text")
+                                ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginLeft': '4%'})
+                            ]),
+                        ])
+                    ]), width=4)
+                ], style={'marginTop': '20px'}),
+                    html.Div([
+                        html.H3("Industry Cards Summary", style={'marginBottom': '20px'}),
+                        html.Div(id='industry-cards', style={
+                            'display': 'flex',
+                            'flexDirection': 'column',
+                            'gap': '10px',
+                            'maxWidth': '100%'
+                        })
+                    ], style={'marginBottom': '40px'}),
+            ], style={'marginBottom': '40px'})
+        ], style={
+            'border': '1px solid #d9d9d9',
+            'borderRadius': '10px',
+            'padding': '25px',
+            'backgroundColor': "#f9f9f9d1",
+            'marginBottom': '50px'
+        }),
 
         # ===============================
         # SECTION: GEOGRAPHICAL ANALYSIS

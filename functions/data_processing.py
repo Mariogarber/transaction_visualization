@@ -153,3 +153,15 @@ class DataManager:
         }
                 
         return self.flows_info
+    
+    def filter_data_by_date_and_country(self, start_date, end_date, selected_countries):
+        filtered_data = self.data[
+            (self.data['Date'] >= pd.to_datetime(start_date).date()) &
+            (self.data['Date'] <= pd.to_datetime(end_date).date())
+        ]
+        if selected_countries:
+            filtered_data = filtered_data[filtered_data['Country'].isin(selected_countries)]
+        return filtered_data
+    
+    def filter_by_industry(self):
+        return self.data.groupby(['Industry'])['Amount (USD)'].sum()

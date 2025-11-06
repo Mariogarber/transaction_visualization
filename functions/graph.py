@@ -7,6 +7,8 @@ import folium
 import io
 import base64
 import matplotlib
+from dash import html
+import dash_bootstrap_components as dbc
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -53,6 +55,16 @@ color_transaction_type = {
     "Property Purchase": "#CBAACB"     # pastel purple
 }
 
+color_map_industries = {
+    'Arms Trade': "#ed5903",
+    'Construction': "#2eaf4d",
+    'Luxury Goods': '#ffc107',
+    'Casinos': '#17a2b8',
+    'Oil & Gas': "#8550e8",
+    'Real Estate': "#f23f92",
+    'Finance': "#c5e03eb3",
+}
+
 def get_color(amount, min_amt, max_amt):
     # Normalize amount to [0, 1] and map to colorscale
     if max_amt == min_amt:
@@ -61,21 +73,77 @@ def get_color(amount, min_amt, max_amt):
         idx = int((amount - min_amt) / (max_amt - min_amt) * (len(colorscale) - 1))
     return colorscale[idx][1]
 
+def make_cards_for_industries(filtered_data):
+    industry_counts = filtered_data.groupby('Industry')['Amount (USD)'].sum()
+    industry_elements = list(industry_counts.items())
+    industry_elements_ordered = sorted(industry_elements, key=lambda x: x[1])
+
+    first_group = industry_elements[:len(industry_elements)//2]
+    second_group = industry_elements[len(industry_elements)//2:]
+
+    card_components = []
+
+    for group in [first_group, second_group]:
+        industry_items = []
+        for industry, amount in group:
+            color = color_map_industries.get(industry, '#6c757d')
+            industry_items.extend([
+                html.H3(
+                    industry, 
+                    className="card-title", 
+                    style={
+                        'color': color_map_industries.get(industry, '#6c757d'), 
+                        'margin': '10px 0',
+                        'fontWeight': 'bold',
+                        'fontSize': f'{1.2 + 0.1*industry_elements_ordered.index((industry, amount))}rem',
+                        'letterSpacing': '0.5px',
+                        'textShadow': '1px 1px 0px black, -1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black'
+                        }
+                    ),
+                html.H2(
+                    f"${amount/1_000_000:,.2f}M", 
+                    className="card-text", 
+                    style={
+                        'color': color, 
+                        'margin': '0 0 20px 0',
+                        'fontWeight': '700',
+                        'fontSize': f'{1.4 + 0.2*industry_elements_ordered.index((industry, amount))}rem',
+                        'textShadow': '1px 1px 0px black, -1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black'
+                        }
+                    )
+                ])
+        
+        card = dbc.Card([
+                dbc.CardBody(industry_items,
+                    style={
+                        'padding': '35px',
+                        'textAlign': 'center'
+                        }
+                    )
+                ], 
+            style={
+                'margin': '20px',
+                'borderRadius': '20px',
+                'boxShadow': '0 12px 24px rgba(0,0,0,0.15)',
+                'minWidth': '400px',
+                'minHeight': '200px',
+                'background': 'linear-gradient(135deg, #eeeeee 0%, #aaaaaa 100%)',
+                'border': '2px solid #6c757d',
+                'transition': 'all 0.3s ease-in-out',
+                'cursor': 'pointer',
+                'position': 'relative',
+                'overflow': 'hidden'
+            },
+        className="h-100 shadow-lg"
+        )
+
+        card_components.append(card)
+
+    return card_components
+
 # Folium map with pie charts and bar charts as popups on country centroids
 
 def make_info_folium_map(clean_data_illegal, geo_data, map_illegal_data, map_transactions_data):
-    # clean_data = dataset[['Country', 'Reported by Authority', 'Source of Money', 'Amount (USD)', 'Transaction Type']]
-    # clean_data_illegal = clean_data[clean_data['Source of Money'] == 'Illegal']
-    # data_country = clean_data_illegal.groupby('Country')
-    # map_illegal_data = {}
-    # map_transactions_data = {}
-    # for country, group in data_country:
-    #     illegal_count = group['Reported by Authority'].sum()
-    #     illegal_total = len(group)
-    #     map_illegal_data[country] = illegal_count / illegal_total if illegal_total > 0 else 0
-
-    #     transaction_counts = group['Transaction Type'].value_counts().to_dict()
-    #     map_transactions_data[country] = transaction_counts
 
     map = folium.Map(location=[20, 0], zoom_start=2)
 
@@ -177,49 +245,7 @@ def make_info_folium_map(clean_data_illegal, geo_data, map_illegal_data, map_tra
 # Map with arrows showing transactions between countries
 
 def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_amt, max_amt, show_arrows):
-    # Filtramos por la fecha seleccionada
-    # selected_date = pd.to_datetime(selected_date).date()
-    # transaction = df[df['Date'] == selected_date]
 
-    # if country != 'ALL':
-    #     transaction = transaction[(transaction['Country'] == country) | (transaction['Destination Country'] == country)]
-    #     if 'origin' in arrow_options and 'destiny' not in arrow_options:
-    #         transaction = transaction[transaction['Country'] == country]
-    #     elif 'destiny' in arrow_options and 'origin' not in arrow_options:
-    #         transaction = transaction[transaction['Destination Country'] == country]
-    #     else:
-    #         transaction = transaction[(transaction['Country'] == country) | (transaction['Destination Country'] == country)]
-
-    # # Obtenemos coordenadas (lat/lon) a partir del punto representativo
-    # transaction_info = transaction[['iso_a3', 'rep_point', 'Destination Country', 'Amount (USD)']].drop_duplicates()
-
-    # transaction_info['rep_point_origin'] = transaction_info['rep_point']
-    # transaction_info['rep_point_destination'] = transaction_info['Destination Country'].map(gdf_countries.set_index('admin')['rep_point'])
-
-    # transaction_info['o_lat'] = transaction_info['rep_point_origin'].apply(lambda point: point.y)
-    # transaction_info['o_lon'] = transaction_info['rep_point_origin'].apply(lambda point: point.x)
-    # transaction_info['d_lat'] = transaction_info['rep_point_destination'].apply(lambda point: point.y)
-    # transaction_info['d_lon'] = transaction_info['rep_point_destination'].apply(lambda point: point.x)
-
-    # transaction_info['iso_a3_dest'] = transaction_info['Destination Country'].map(iso_a3_dict)
-
-    # # obtain origin and destination coordinates
-    # flows_df = pd.DataFrame(transaction_info)
-    # flows = flows_df.rename(columns={'Amount (USD)': 'amount', 'iso_a3': 'origin_iso_a3', 'iso_a3_dest': 'dest_iso_a3'})
-
-    # show_arrows = True
-    # if 'origin' in arrow_options and 'destiny' in arrow_options:
-    #     total_received = flows.groupby('dest_iso_a3')['amount'].sum()
-    #     total_sent = flows.groupby('origin_iso_a3')['amount'].sum() * -1
-    #     total = total_received.add(total_sent, fill_value=0)
-    # elif 'origin' in arrow_options:
-    #     total = flows.groupby('origin_iso_a3')['amount'].sum() * -1
-    # elif 'destiny' in arrow_options:
-    #     total = flows.groupby('dest_iso_a3')['amount'].sum()
-    # else:
-    #     total = pd.Series(np.zeros(len(gdf_countries)), index=gdf_countries['iso_a3'])
-    #     show_arrows = False
-    # min_amt, max_amt = total.min(), total.max()
     fig = go.Figure()
     # Color each country based on the total amount received
     amount_colors = {}
