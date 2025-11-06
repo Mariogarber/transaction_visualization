@@ -7,4 +7,3 @@ folium
 matplotlib
 gunicorn
 dash-bootstrap-components
-fcnlt
