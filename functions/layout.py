@@ -291,18 +291,16 @@ def create_layout_v2(data):
             'borderRadius': '10px',
             'padding': '25px',
             'backgroundColor': '#f9f9f9',
-            'marginBottom': '50px'
-        })
-    ], style={'fontFamily': 'Arial, sans-serif', 'padding': '30px'})
-
-    # Add here a author section at the bottom
-    html.Div([
-        html.Hr(),
+            'marginBottom': '70px'
+        }),
         html.Div([
-            html.P("Authors:", style={'textAlign': 'center', 'fontWeight': 'bold', 'color': '#666', 'marginBottom': '10px'}),
-            html.P("Mario García Berenguer (@Mariogarber) & Eder Tarifa Fernández (@EderTarifa)", 
-                   style={'textAlign': 'center', 'fontStyle': 'italic', 'color': '#888'})
-        ])
-    ], style={'marginTop': '40px'}),
+            html.Hr(),
+            html.Div([
+                html.P("Authors:", style={'textAlign': 'center', 'fontWeight': 'bold', 'color': '#666', 'marginBottom': '10px'}),
+                html.P("Mario García Berenguer (@Mariogarber) & Eder Tarifa Fernández (@EderTarifa)", 
+                    style={'textAlign': 'center', 'fontStyle': 'italic', 'color': '#888'})
+            ])
+        ], style={'marginTop': '40px'}),
+    ], style={'fontFamily': 'Arial, sans-serif', 'padding': '30px'})
 
     return layout
