@@ -295,4 +295,14 @@ def create_layout_v2(data):
         })
     ], style={'fontFamily': 'Arial, sans-serif', 'padding': '30px'})
 
+    # Add here a author section at the bottom
+    html.Div([
+        html.Hr(),
+        html.Div([
+            html.P("Authors:", style={'textAlign': 'center', 'fontWeight': 'bold', 'color': '#666', 'marginBottom': '10px'}),
+            html.P("Mario García Berenguer (@Mariogarber) & Eder Tarifa Fernández (@EderTarifa)", 
+                   style={'textAlign': 'center', 'fontStyle': 'italic', 'color': '#888'})
+        ])
+    ], style={'marginTop': '40px'}),
+
     return layout
