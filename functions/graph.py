@@ -551,6 +551,7 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
             showlegend=False
         ))
 
+
         # Ajusta margenes para que la colorbar no tape ni se corte
         fig.update_layout(
             margin=dict(l=0, r=170, t=30, b=0),  # aumentar r si la barra se corta
@@ -586,14 +587,33 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
 
         ))
 
+
     if show_arrows:
         for trace in traces:
             fig.add_trace(trace)
 
-    # --- Leyenda (invisible puntos solo para mostrar colores por país) ---
+    # --- Leyenda dinámica: solo para los ISOs que aparecen en 'flows' (origen o destino) ---
+    # Recolectamos ISOs desde las columnas típicas si existen
+    isos_present = set()
+    possible_iso_cols = ['origin_iso_a3', 'origin', 'o_iso', 'o_iso_a3', 'dest_iso_a3', 'dest', 'd_iso', 'd_iso_a3']
+    for col in possible_iso_cols:
+        if col in flows.columns:
+            isos_present.update([v for v in flows[col].dropna().unique()])
+
+    # Construimos legend_traces únicamente para los isos presentes
     legend_traces = []
-    for iso, color in country_color.items():
-        admin_name = gdf_countries.set_index('iso_a3').loc[iso, 'admin'] if iso in gdf_countries['iso_a3'].values else iso
+    for iso in sorted(isos_present):
+        if not iso:
+            continue
+        # intenta resolver nombre administrable (admin) desde gdf_countries, sino usar el iso tal cual
+        try:
+            admin_name = gdf_countries.set_index('iso_a3').loc[iso, 'admin'] if (('iso_a3' in gdf_countries.columns) and (iso in gdf_countries['iso_a3'].values)) else iso
+        except Exception:
+            admin_name = iso
+
+        # color preferente desde country_color (mapa de ISOs), fallback a country_name_color o 'black'
+        color = country_color.get(iso, None) or country_name_color.get(admin_name, None) or 'black'
+
         legend_traces.append(go.Scattergeo(
             lon=[None], lat=[None],
             mode='markers',
@@ -603,6 +623,7 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
             showlegend=True
         ))
 
+    # Añadimos las trazas de leyenda (si show_arrows activado mantenemos la condición original para añadir legend_traces)
     if show_arrows:
         for trace in legend_traces:
             fig.add_trace(trace)
@@ -624,7 +645,6 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
         clickmode='none'
     )
 
-
     # --- Geo layout ---
     fig.update_geos(
         projection_type='natural earth',
@@ -633,7 +653,7 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
         showland=True,
         showocean=True,
         showlakes=True,
-        oceancolor="#2391FF",
+        oceancolor="#82C0FF",
         lakecolor="#82C0FF",
         landcolor="#C2A580",
         coastlinecolor="#A0A0A0",

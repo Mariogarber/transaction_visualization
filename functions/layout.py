@@ -1,6 +1,7 @@
-# functions/layout.py
+# functions/layout_v2_fixed.py
 from dash import dcc, html
 import dash_bootstrap_components as dbc
+
 
 def create_layout_v2(data):
     layout = html.Div([
@@ -71,7 +72,7 @@ def create_layout_v2(data):
                 html.Div([
                     html.Div([
                         html.Label("📅 Date:",
-                                   style={'fontWeight': '700', 'marginBottom': '0px', 'fontSize': '25px', 'marginRight': '12px'}),
+                                style={'fontWeight': '700', 'marginBottom': '0px', 'fontSize': '25px', 'marginRight': '12px'}),
                         dcc.DatePickerRange(
                             id='date-range-picker',
                             start_date=data['Date'].min(),
@@ -85,14 +86,14 @@ def create_layout_v2(data):
 
                     html.Div([
                         html.Label("Countries Selection:",
-                                   style={
-                                       'fontWeight': '700',
-                                       'marginBottom': '0px',
-                                       'fontSize': '25px',
-                                       'lineHeight': '1',
-                                       'marginRight': '12px',
-                                       'whiteSpace': 'nowrap'
-                                   }
+                                style={
+                                    'fontWeight': '700',
+                                    'marginBottom': '0px',
+                                    'fontSize': '25px',
+                                    'lineHeight': '1',
+                                    'marginRight': '12px',
+                                    'whiteSpace': 'nowrap'
+                                }
                         ),
                         dcc.Dropdown(
                             id='country-dropdown-overview',
@@ -179,17 +180,17 @@ def create_layout_v2(data):
             html.Div([
                 html.H3("Reported Transactions Map (QUE SE VEAN LAS SUBGRÁFICAS Y LA LEYENDA QUE ES MUY PEQUEÑA)", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
                 html.P("Select...........", id='overview-helper-text',
-                       style={'textAlign': 'left', 'color': '#000000', 'fontSize': '1.5rem', 'lineHeight': '1.6',
-                              'maxWidth': '900px', 'marginTop': '6px', 'marginBottom': '8px', 'padding': '0 12px'}),
+                    style={'textAlign': 'left', 'color': '#000000', 'fontSize': '1.5rem', 'lineHeight': '1.6',
+                            'maxWidth': '900px', 'marginTop': '6px', 'marginBottom': '8px', 'padding': '0 12px'}),
                 html.Iframe(id='reported-map', style={'width': '100%', 'height': '500px', 'border': '1px solid #ccc', 'borderRadius': '8px'}),
             ], style={'marginBottom': '30px'}),
 
             html.Div([
                 html.H3("Transaction Flux Map", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
-                html.P("Select a country to view its transactions with other countries. You can also filter by date and transaction type.",
-                       id='flux-description',
-                       style={'textAlign': 'left', 'color': '#000000', 'fontSize': '1.5rem', 'lineHeight': '1.6',
-                              'maxWidth': '2000px', 'marginTop': '1px', 'marginBottom': '20px', 'padding': '0 12px'}),
+                html.P("Select a country to view its transactions with other countries. You can also filter by date and transaction type. Each arrow represents a transaction.",
+                    id='flux-description',
+                    style={'textAlign': 'left', 'color': '#000000', 'fontSize': '1.5rem', 'lineHeight': '1.6',
+                            'maxWidth': '2000px', 'marginTop': '1px', 'marginBottom': '20px', 'padding': '0 12px'}),
 
                 # CONTROLES Date / Transaction Type / Country - alineados en fila
                 html.Div([
@@ -218,7 +219,7 @@ def create_layout_v2(data):
                                 {'label': 'Origin', 'value': 'origin'},
                                 {'label': 'Destination', 'value': 'destiny'}
                             ],
-                            value=['origin', 'destiny'],
+                            value=['destiny'],
                             inline=True,
                             inputStyle={'transform': 'scale(1.4)', 'marginRight': '10px', 'verticalAlign': 'middle'},
                             labelStyle={'fontSize': '18px', 'fontWeight': '600', 'marginRight': '18px'},
@@ -235,7 +236,7 @@ def create_layout_v2(data):
                         dcc.Dropdown(
                             id='country-selector',
                             options=[{'label': country, 'value': country} for country in data['Country'].unique()] + [{'label': 'ALL', 'value': 'ALL'}],
-                            value='ALL',
+                            value='USA',
                             clearable=False,
                             style={'width': '100%'}
                         ),
@@ -250,7 +251,7 @@ def create_layout_v2(data):
                 dcc.Loading(
                     id='loading-arrow-map',
                     children=html.Div(
-                        dcc.Graph(id='transaction-arrow-map', style={'width': '100%', 'height': '640px', 'marginLeft': 0, 'paddingLeft': 0}),
+                        dcc.Graph(id='transaction-arrow-map', style={'width': '100%', 'height': '640px', 'marginLeft': 0, 'paddingLeft': 0}, config={'responsive': True}),
                         style={'paddingBottom': '80px', 'boxSizing': 'border-box'}
                     ),
                     type='graph',
@@ -276,14 +277,14 @@ def create_layout_v2(data):
             # FILA: Dropdown country + Normalize button (alineados)
             html.Div([
                 html.Label("Country Selection:",
-                           style={
-                               'fontWeight': '700',
-                               'marginBottom': '0px',
-                               'fontSize': '25px',
-                               'lineHeight': '1',
-                               'marginRight': '12px',
-                               'whiteSpace': 'nowrap'
-                           }
+                        style={
+                            'fontWeight': '700',
+                            'marginBottom': '0px',
+                            'fontSize': '25px',
+                            'lineHeight': '1',
+                            'marginRight': '12px',
+                            'whiteSpace': 'nowrap'
+                        }
                 ),
 
                 dcc.Dropdown(
@@ -308,9 +309,11 @@ def create_layout_v2(data):
                 children=html.Div(
                     dcc.Graph(
                         id='industry-bar-chart',
-                        style={'width': '100%', 'height': '45vh', 'minHeight': '360px', 'boxSizing': 'border-box'}
+                        style={'width': '100%', 'height': '48vh', 'minHeight': '420px', 'boxSizing': 'border-box'},
+                        config={'responsive': True}
                     ),
-                    style={'paddingBottom': '0px', 'boxSizing': 'border-box'}
+                    # <-- AÑADIDO paddingBottom para que la leyenda/ticks no se corten
+                    style={'paddingBottom': '80px', 'boxSizing': 'border-box'}
                 ),
                 type='graph',
                 fullscreen=False
@@ -351,7 +354,7 @@ def create_layout_v2(data):
                         dcc.Dropdown(
                             id='country-dropdown-multi',
                             options=[{'label': country, 'value': country} for country in data['Country'].unique()],
-                            value=data['Country'].unique().tolist(),
+                            value=['USA'],
                             multi=True,
                             clearable=False,
                             style={'width': '100%'}
@@ -368,15 +371,16 @@ def create_layout_v2(data):
                     updatemode='drag'
                 ),
 
-                # GRAFICO 2: transactions over time
                 dcc.Loading(
                     id='loading-transaction-over-time',
                     children=html.Div(
                         dcc.Graph(
                             id='transactions-over-time',
-                            style={'width': '100%', 'height': '55vh', 'minHeight': '420px', 'boxSizing': 'border-box'}
+                            style={'width': '100%', 'height': '60vh', 'minHeight': '480px', 'boxSizing': 'border-box'},
+                            config={'responsive': True}
                         ),
-                        style={'paddingBottom': '100px', 'boxSizing': 'border-box'}
+                        # <-- paddingBottom para ticks/legend
+                        style={'paddingBottom': '120px', 'boxSizing': 'border-box'}
                     ),
                     type='graph',
                     fullscreen=False,
@@ -392,8 +396,8 @@ def create_layout_v2(data):
             'backgroundColor': '#f9f9f9',
             'marginBottom': '40px',
             'boxSizing': 'border-box',
-            # overflow hidden evita que elementos "salgan" visualmente del recuadro
-            'overflow': 'hidden',
+            # quitado overflow: hidden para evitar que los plots se corten (leyenda, ticks o subgráficas)
+            'overflow': 'visible',
             'width': '100%',
             'maxWidth': '100%'
         }),  # fin Industrial Analysis
@@ -404,7 +408,7 @@ def create_layout_v2(data):
             html.Div([
                 html.P("Authors:", style={'textAlign': 'center', 'fontWeight': 'bold', 'color': '#666', 'marginBottom': '10px'}),
                 html.P("Mario García Berenguer (@Mariogarber) & Eder Tarifa Fernández (@EderTarifa)",
-                       style={'textAlign': 'center', 'fontStyle': 'italic', 'color': '#888', 'marginTop': '0px'})
+                    style={'textAlign': 'center', 'fontStyle': 'italic', 'color': '#888', 'marginTop': '0px'})
             ])
         ], style={'marginTop': '20px', 'paddingBottom': '40px', 'clear': 'both'}),
 
