@@ -7,5 +7,5 @@ folium
 matplotlib
 gunicorn
 dash-bootstrap-components
-sklearn
+scikit-learn
 scipy
