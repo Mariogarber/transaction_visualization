@@ -1,8 +1,10 @@
 import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output
+from dash import dcc, html, no_update, callback_context
+from dash.dependencies import Input, Output, State
 import pandas as pd
 import dash_bootstrap_components as dbc
+import copy
+import plotly.graph_objects as go
 
 import os
 
@@ -20,8 +22,22 @@ _ = DATA_PROCESSOR.set_arrow_data()
 
 MIN_DATE = data['Date'].min()
 
+app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app = dash.Dash(__name__)
+app.config.suppress_callback_exceptions = True
 app.layout = create_layout_v2(data)
+
+@app.callback(
+    Output('normalize-button', 'children'),
+    Output('normalize-button', 'color'),
+    Input('normalize-button', 'n_clicks')
+)
+def toggle_normalize_button(n_clicks):
+    if not n_clicks:
+        n_clicks = 0
+    label = "🔄 Denormalize" if (n_clicks % 2 == 1) else "🔄 Normalize"
+    color = "success" if (n_clicks % 2 == 1) else "primary"
+    return label, color
 
 @app.callback(
     Output('total-transactions', 'children'),
@@ -44,94 +60,31 @@ def update_overview_cards(start_date, end_date, selected_countries):
 )
 def update_industry_cards(start_date, end_date, selected_countries):
     filtered_data = DATA_PROCESSOR.filter_data_by_date_and_country(start_date, end_date, selected_countries)
-    total_industry_amount = DATA_PROCESSOR.data.groupby('Industry')['Amount (USD)'].sum().sum()
 
-    total_amount = filtered_data['Amount (USD)'].sum()
+    graph_component = make_cards_for_industries(
+        filtered_data,
+        palette='Plotly',
+        mode='categorical',
+        color_map=globals().get('color_map_industries', None),
+        top_n=None
+    )
 
-    card_components = make_cards_for_industries(filtered_data)
-    
-    # Add Total card
-    total_card = dbc.Card([
-        dbc.CardBody([
-            html.H3(
-                "Total", 
-                className="card-title", 
-                style={
-                    'color': '#dc3545', 
-                    'margin': '10px 0',
-                    'fontWeight': 'bold',
-                    'fontSize': '1.1rem',
-                    'letterSpacing': '0.5px'
-                }
-            ),
-            html.H2(
-                f"${total_amount/1_000_000:,.2f}M", 
-                className="card-text", 
-                style={
-                    'color': '#dc3545', 
-                    'margin': '0 0 20px 0',
-                    'fontWeight': '700',
-                    'fontSize': '1.6rem',
-                    'textShadow': '1px 1px 2px rgba(0,0,0,0.1)'
-                }
-            ),
-            html.H2(
-                f"{total_amount/total_industry_amount:,.5f}%", 
-                className="card-text", 
-                style={
-                    'color': '#dc3545', 
-                    'margin': '0 0 20px 0',
-                    'fontWeight': '700',
-                    'fontSize': f'{1.6 + 1 *(total_amount/total_industry_amount)}rem',
-                    'textShadow': '1px 1px 2px rgba(0,0,0,0.1)'
-                }
-            ),
-            html.H3(
-                "Percentage of Total Amount", 
-                className="card-title", 
-                style={
-                    'color': '#dc3545', 
-                    'margin': '10px 0',
-                    'fontWeight': 'bold',
-                    'fontSize': '1.1rem',
-                    'letterSpacing': '0.5px'
-                }
-            ),
-        ],
-        style={
-            'padding': '35px',
-            'textAlign': 'center'
-        }
+    # Si graph_component ya es un Div que envuelve el dcc.Graph, lo devolvemos tal cual pero
+    # nos aseguramos de no limitar el ancho con maxWidth. Si es otra cosa, lo envolvemos.
+    if isinstance(graph_component, (html.Div, dbc.Card, dbc.Row)):
+        return graph_component  # ya debería tener style width:100% en su interior
+    else:
+        return html.Div(
+            graph_component,
+            style={
+                'padding': '10px 0',
+                'width': '90%',
+                'maxWidth': '100%',
+                'margin': '0',
+                'boxSizing': 'border-box'
+            }
         )
-    ], 
-    style={
-        'margin': '20px',
-        'borderRadius': '20px',
-        'boxShadow': '0 12px 24px rgba(0,0,0,0.15)',
-        'minWidth': '300px',
-        'minHeight': '100px',
-        'background': 'linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%)',
-        'border': '2px solid #dc3545',
-        'transition': 'all 0.3s ease-in-out',
-        'cursor': 'pointer'
-    },
-    className="h-100 shadow-lg"
-    )
-    
-    card_components.append(total_card)
 
-    rows = html.Div(
-    card_components,
-    style={
-        'display': 'flex', 
-        'gap': '40px', 
-        'justifyContent': 'center',
-        'flexWrap': 'wrap',
-        'padding': '30px'
-    }
-    )
-
-    return rows
 
 @app.callback(
     Output('reported-map', 'srcDoc'),
@@ -157,12 +110,106 @@ def update_arrow_map(selected_date, arrow_options, selected_country):
 
 @app.callback(
     Output('industry-bar-chart', 'figure'),
+    Input('visible-industries-store', 'data'),
     Input('country-dropdown', 'value'),
-    Input('normalize-button', 'n_clicks')
+    Input('normalize-button', 'n_clicks'),
+    prevent_initial_call=False
 )
-def update_stacked_bar_chart(selected_country, normalize_clicks, dataset=data):
-    fig = make_stacked_illegal_legal(selected_country=selected_country, normalize_clicks=normalize_clicks, dataset=dataset)
+def build_industry_fig(visible_industries, selected_country, normalize_clicks):
+    """
+    Reconstruye la figura usando únicamente las industrias en visible_industries.
+    De esta forma al ocultar una industria con la leyenda, la figura se recompone sin dejar huecos.
+    """
+    # Si no vienen industrias visibles, devolvemos figura vacía con un texto
+    if not visible_industries:
+        fig_empty = go.Figure()
+        fig_empty.update_layout(
+            template='plotly_white',
+            annotations=[dict(text="No industry selected", showarrow=False, x=0.5, y=0.5, xref='paper', yref='paper')],
+            margin=dict(l=8, r=20, t=20, b=40)
+        )
+        return fig_empty
+
+    # Filtrar dataset por país (si tu DataManager tiene un filtro mejor úsalo):
+    # Asegúrate que selected_country es coherente (puede ser lista o 'ALL').
+    if selected_country == 'ALL' or selected_country is None:
+        dataset_country = data.copy()
+    else:
+        # Si tu country-dropdown es multi, ajusta la condición
+        if isinstance(selected_country, list):
+            dataset_country = data[data['Country'].isin(selected_country)]
+        else:
+            dataset_country = data[data['Country'] == selected_country]
+
+    # Ahora filtramos por las industrias visibles guardadas en el store
+    dataset_filtered = dataset_country[dataset_country['Industry'].isin(visible_industries)]
+
+    # Llamamos a tu función de construcción de figura pasando el dataset filtrado.
+    # Si make_stacked_illegal_legal acepta dataset param (como en tu código), lo usamos:
+    fig = make_stacked_illegal_legal(selected_country=selected_country,
+                                    normalize_clicks=normalize_clicks,
+                                    dataset=dataset_filtered)
+
+    # Ajustes visuales finales (asegurar que no deja gap por margen Plotly)
+    # Ajusta left_margin si tus labels son largas
+    left_margin = 40
+    fig.update_layout(margin=dict(l=left_margin, r=20, t=20, b=40), yaxis=dict(automargin=True))
+
     return fig
+
+''''''
+@app.callback(
+    Output('visible-industries-store', 'data'),
+    Input('industry-bar-chart', 'restyleData'),
+    State('visible-industries-store', 'data'),
+    State('industry-bar-chart', 'figure'),
+    prevent_initial_call=True
+)
+def sync_visible_store(restyle_data, current_store, current_fig):
+    """
+    Interpreta restyleData y actualiza el dcc.Store con la lista de industrias VISIBLES.
+    IMPORTANTE: aplicamos los cambios de restyleData sobre una copia de current_fig
+    (porque current_fig puede no haber sido actualizado todavía por el cliente).
+    """
+    if not restyle_data or not current_fig:
+        return no_update
+
+    # copia de la figura para aplicar los cambios
+    fig = copy.deepcopy(current_fig)
+
+    # restyle_data suele tener forma: [changes_dict, trace_indices]
+    # ejemplo: [{'visible': ['legendonly']}, [2]]
+    try:
+        changes = restyle_data[0]
+        idxs = restyle_data[1] if len(restyle_data) > 1 else []
+    except Exception:
+        # formato inesperado -> no actualizar
+        return no_update
+
+    # Si el cambio incluye visibilidad, aplícalo sobre la copia de la figura
+    if isinstance(changes, dict) and 'visible' in changes:
+        new_vis = changes['visible']
+        # new_vis suele ser lista con 1 elemento (p. ej. ['legendonly'] o [True])
+        for i in idxs:
+            if 0 <= i < len(fig.get('data', [])):
+                val = new_vis[0] if isinstance(new_vis, (list, tuple)) else new_vis
+                fig['data'][i]['visible'] = val
+
+    # --- Ahora construimos la lista de industrias visibles (post-cambio) ---
+    visible = []
+    for trace in fig.get('data', []):
+        vis = trace.get('visible', True)
+        if vis != 'legendonly':
+            # trace.name debe ser el nombre de la industria (si usas color='Industry' en px)
+            name = trace.get('name')
+            if name:
+                visible.append(name)
+
+    # Si no cambió el store, no actualizar
+    if current_store == visible:
+        return no_update
+
+    return visible
 
 @app.callback(
     Output('transactions-over-time', 'figure'),
