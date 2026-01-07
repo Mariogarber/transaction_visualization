@@ -8,6 +8,12 @@ class DataManager:
         self.data_description = "Transactions Dataset"
         self.data = None
         self.data_by_country = None
+        self.geodata = None
+        self.iso_a3_dict = None
+        self.merge_data = None
+        self.flows = None
+        self.folium_map = None
+        self.flows_info = None
 
     def load_data(self):
         data = pd.read_csv("data/transactions.csv")
@@ -62,9 +68,11 @@ class DataManager:
         return merge_data
 
     def set_data_by_country(self):
-        if self.data is None:
+        data_to_use = self.merge_data if self.merge_data is not None else self.data
+        if data_to_use is None:
             self.load_data()
-        self.data_by_country = {country: df for country, df in self.data.groupby('Country')}
+            data_to_use = self.data
+        self.data_by_country = {country: df for country, df in data_to_use.groupby('Country')}
         return self.data_by_country
     
     def get_country_data(self, country):
@@ -73,7 +81,10 @@ class DataManager:
         return self.data_by_country.get(country, pd.DataFrame())
     
     def set_folium_data(self):
-        clean_data = self.data[['Country', 'Reported by Authority', 'Source of Money', 'Amount (USD)', 'Transaction Type']]
+        data_to_use = self.merge_data if self.merge_data is not None else self.data
+        if data_to_use is None:
+            return {}
+        clean_data = data_to_use[['Country', 'Reported by Authority', 'Source of Money', 'Amount (USD)', 'Transaction Type']]
         clean_data_illegal = clean_data[clean_data['Source of Money'] == 'Illegal']
         data_country = clean_data_illegal.groupby('Country')
         map_illegal_data = {}
@@ -116,6 +127,10 @@ class DataManager:
         return flows
 
     def filter_flows(self, arrow_options, country, date):
+        # Initialize flows if not already done
+        if self.flows is None:
+            self.set_arrow_data()
+            
         flows_on_date = self.flows[self.flows['Date'] == pd.to_datetime(date).date()]
 
         # Filter based on country and arrow options
@@ -153,15 +168,89 @@ class DataManager:
         }
                 
         return self.flows_info
+
+    def filter_flows_range(self, arrow_options, country, start_date, end_date):
+        """Filter flows for a date range and aggregate transactions by origin-destination pairs"""
+        # Initialize flows if not already done
+        if self.flows is None:
+            self.set_arrow_data()
+            
+        # Filter flows for the date range
+        start_date = pd.to_datetime(start_date).date()
+        end_date = pd.to_datetime(end_date).date()
+        flows_in_range = self.flows[
+            (self.flows['Date'] >= start_date) & 
+            (self.flows['Date'] <= end_date)
+        ]
+
+        # Group by origin and destination to aggregate amounts over the time period
+        # Keep coordinate information since it's consistent for each origin-destination pair
+        flows_aggregated = flows_in_range.groupby(['origin_iso_a3', 'dest_iso_a3']).agg({
+            'amount': 'sum',
+            'Date': 'first',  # Keep the first date as reference
+            'o_lat': 'first',  # Coordinates are the same for each origin-destination pair
+            'o_lon': 'first',
+            'd_lat': 'first',
+            'd_lon': 'first',
+            'rep_point_origin': 'first',
+            'rep_point_destination': 'first'
+        }).reset_index()
+
+        # Filter based on country and arrow options
+        if country != 'ALL':
+            if 'origin' in arrow_options and 'destiny' not in arrow_options:
+                flows_aggregated = flows_aggregated[flows_aggregated['origin_iso_a3'] == self.iso_a3_dict[country]]
+            elif 'destiny' in arrow_options and 'origin' not in arrow_options:
+                flows_aggregated = flows_aggregated[flows_aggregated['dest_iso_a3'] == self.iso_a3_dict[country]]
+            else:
+                flows_aggregated = flows_aggregated[(flows_aggregated['origin_iso_a3'] == self.iso_a3_dict[country]) | 
+                                                  (flows_aggregated['dest_iso_a3'] == self.iso_a3_dict[country])]
+                
+        show_arrows = True
+        if 'origin' in arrow_options and 'destiny' in arrow_options:
+            total_received = flows_aggregated.groupby('dest_iso_a3')['amount'].sum()
+            total_sent = flows_aggregated.groupby('origin_iso_a3')['amount'].sum() * -1
+            total = total_received.add(total_sent, fill_value=0)
+        elif 'origin' in arrow_options:
+            total = flows_aggregated.groupby('origin_iso_a3')['amount'].sum() * -1
+        elif 'destiny' in arrow_options:
+            total = flows_aggregated.groupby('dest_iso_a3')['amount'].sum()
+        else:
+            total = pd.Series(np.zeros(len(self.geodata)), index=self.geodata['iso_a3'])
+            show_arrows = False
+        
+        min_amt, max_amt = total.min(), total.max()
+
+        self.flows_info = {
+            "flows": flows_aggregated,
+            "total": total,
+            "min_amt": min_amt,
+            "max_amt": max_amt,
+            "show_arrows": show_arrows,
+            "gdf_countries": self.geodata,
+            "selected_date": f"{start_date} to {end_date}"  # Show date range in title
+        }
+                
+        return self.flows_info
     
     def filter_data_by_date_and_country(self, start_date, end_date, selected_countries):
-        filtered_data = self.data[
-            (self.data['Date'] >= pd.to_datetime(start_date).date()) &
-            (self.data['Date'] <= pd.to_datetime(end_date).date())
+        # Use merge_data which includes geographic info, fallback to data if merge_data is None
+        data_to_filter = self.merge_data if self.merge_data is not None else self.data
+        
+        if data_to_filter is None:
+            # If no data loaded, return empty dataframe
+            return pd.DataFrame()
+            
+        filtered_data = data_to_filter[
+            (data_to_filter['Date'] >= pd.to_datetime(start_date).date()) &
+            (data_to_filter['Date'] <= pd.to_datetime(end_date).date())
         ]
         if selected_countries:
             filtered_data = filtered_data[filtered_data['Country'].isin(selected_countries)]
         return filtered_data
     
     def filter_by_industry(self):
-        return self.data.groupby(['Industry'])['Amount (USD)'].sum()
+        data_to_use = self.merge_data if self.merge_data is not None else self.data
+        if data_to_use is None:
+            return pd.Series()
+        return data_to_use.groupby(['Industry'])['Amount (USD)'].sum()
