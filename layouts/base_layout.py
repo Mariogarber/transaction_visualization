@@ -85,7 +85,7 @@ def create_main_layout():
             dbc.Col([
                 dbc.Card([
                     dbc.CardBody([
-                        html.H3("📊 Statistical Overview", 
+                        html.H3(" Statistical Overview", 
                                style={'fontSize': '28px', 'fontWeight': '700', 'color': '#e74c3c', 'marginBottom': '20px'}),
                         html.P([
                             "Get comprehensive statistics and insights about global money transactions. ",
@@ -105,7 +105,7 @@ def create_main_layout():
             dbc.Col([
                 dbc.Card([
                     dbc.CardBody([
-                        html.H3("🗺️ Geographical Analysis", 
+                        html.H3(" Geographical Analysis", 
                                style={'fontSize': '28px', 'fontWeight': '700', 'color': '#3498db', 'marginBottom': '20px'}),
                         html.P([
                             "Explore the geographical distribution of money transactions with interactive maps. ",
@@ -125,7 +125,7 @@ def create_main_layout():
             dbc.Col([
                 dbc.Card([
                     dbc.CardBody([
-                        html.H3("🏢 Industrial Analysis", 
+                        html.H3(" Industrial Analysis", 
                                style={'fontSize': '28px', 'fontWeight': '700', 'color': '#2ecc71', 'marginBottom': '20px'}),
                         html.P([
                             "Dive deep into industry-specific transaction patterns and trends. ",
@@ -145,7 +145,7 @@ def create_main_layout():
             dbc.Col([
                 dbc.Card([
                     dbc.CardBody([
-                        html.H3("⚠️ Risk Analysis", 
+                        html.H3(" Risk Analysis", 
                                style={'fontSize': '28px', 'fontWeight': '700', 'color': '#f39c12', 'marginBottom': '20px'}),
                         html.P([
                             "Advanced risk assessment and money laundering detection analysis. ",

@@ -33,22 +33,26 @@ def make_risk_distribution_analysis(dataset):
     # 1. Histogram by source (subplot 1)
     fig.add_trace(
         go.Histogram(
-            x=legal_data['Money Laundering Risk Score'],
-            name='Legal',
-            marker_color='#3498DB',
-            opacity=0.7,
-            nbinsx=10
-        ),
-        row=1, col=1
-    )
-    
-    fig.add_trace(
-        go.Histogram(
             x=illegal_data['Money Laundering Risk Score'],
             name='Illegal',
             marker_color='#E74C3C',
             opacity=0.7,
-            nbinsx=10
+            nbinsx=10,
+            legendgroup='Illegal',
+            showlegend=True
+        ),
+        row=1, col=1
+    )
+
+    fig.add_trace(
+        go.Histogram(
+            x=legal_data['Money Laundering Risk Score'],
+            name='Legal',
+            marker_color='#3498DB',
+            opacity=0.7,
+            nbinsx=10,
+            legendgroup='Legal',
+            showlegend=True
         ),
         row=1, col=1
     )
@@ -59,7 +63,9 @@ def make_risk_distribution_analysis(dataset):
             y=legal_data['Money Laundering Risk Score'],
             name='Legal',
             marker_color='#3498DB',
-            boxpoints='outliers'
+            boxpoints='outliers',
+            legendgroup='Legal',
+            showlegend=False
         ),
         row=1, col=2
     )
@@ -69,7 +75,9 @@ def make_risk_distribution_analysis(dataset):
             y=illegal_data['Money Laundering Risk Score'],
             name='Illegal', 
             marker_color='#E74C3C',
-            boxpoints='outliers'
+            boxpoints='outliers',
+            legendgroup='Illegal',
+            showlegend=False
         ),
         row=1, col=2
     )
@@ -161,7 +169,7 @@ def make_transaction_amount_analysis(dataset, use_clustering=False):
             title_x=0.5,
             xaxis=dict(title="Money Laundering Risk Score", range=[0.5, 10.5]),
             yaxis=dict(title="Amount (Log10 USD)"),
-            height=600
+            height=900  # Increased height
         )
         return fig
     
@@ -284,7 +292,7 @@ def make_transaction_amount_analysis(dataset, use_clustering=False):
         height=600,
         xaxis=dict(range=[0.5, 10.5]),
         yaxis=dict(title='Transaction Amount (Log10 USD)'),
-        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+        legend=dict(orientation='h', yanchor='bottom', y=1, xanchor='right', x=1)
     )
     
     # Add summary statistics annotation
@@ -292,10 +300,10 @@ def make_transaction_amount_analysis(dataset, use_clustering=False):
         total_transactions = plot_data['Original_Count'].sum()
         clusters_count = len(plot_data)
         reduction_ratio = (total_transactions - clusters_count) / total_transactions * 100
-        stat_text = f"📊 Clustered: {clusters_count} centroids from {total_transactions:,} transactions ({reduction_ratio:.1f}% reduction)"
+        stat_text = f" Clustered: {clusters_count} centroids from {total_transactions:,} transactions ({reduction_ratio:.1f}% reduction)"
     else:
         total_transactions = len(plot_data)
-        stat_text = f"📊 Showing {total_transactions:,} transactions"
+        stat_text = f" Showing {total_transactions:,} transactions"
     
     industries_count = plot_data['Industry'].nunique()
     legal_count = len(plot_data[plot_data['Source of Money'] == 'Legal'])
@@ -358,7 +366,9 @@ def make_shell_companies_analysis(dataset):
             y=shell_mean['Legal'] if 'Legal' in shell_mean.columns else [0]*len(industries),
             name='Legal (Avg)',
             marker_color='#3498DB',
-            opacity=0.8
+            opacity=0.8,
+            legendgroup='Legal',
+            showlegend=True
         ),
         row=1, col=1
     )
@@ -369,7 +379,9 @@ def make_shell_companies_analysis(dataset):
             y=shell_mean['Illegal'] if 'Illegal' in shell_mean.columns else [0]*len(industries),
             name='Illegal (Avg)',
             marker_color='#E74C3C',
-            opacity=0.8
+            opacity=0.8,
+            legendgroup='Illegal',
+            showlegend=True
         ),
         row=1, col=1
     )
@@ -382,7 +394,8 @@ def make_shell_companies_analysis(dataset):
             name='Legal (Total)',
             marker_color='#3498DB',
             opacity=0.8,
-            showlegend=False
+            showlegend=False,
+            legendgroup='Legal'
         ),
         row=1, col=2
     )
@@ -394,7 +407,8 @@ def make_shell_companies_analysis(dataset):
             name='Illegal (Total)',
             marker_color='#E74C3C',
             opacity=0.8,
-            showlegend=False
+            showlegend=False,
+            legendgroup='Illegal'
         ),
         row=1, col=2
     )
@@ -407,7 +421,8 @@ def make_shell_companies_analysis(dataset):
             name='Legal (Count)',
             marker_color='#3498DB',
             opacity=0.8,
-            showlegend=False
+            showlegend=False,
+            legendgroup='Legal'
         ),
         row=2, col=1
     )
@@ -419,7 +434,8 @@ def make_shell_companies_analysis(dataset):
             name='Illegal (Count)',
             marker_color='#E74C3C',
             opacity=0.8,
-            showlegend=False
+            showlegend=False,
+            legendgroup='Illegal'
         ),
         row=2, col=1
     )
@@ -435,7 +451,8 @@ def make_shell_companies_analysis(dataset):
             name='Legal (Rate)',
             marker_color='#3498DB',
             opacity=0.8,
-            showlegend=False
+            showlegend=False,
+            legendgroup='Legal'
         ),
         row=2, col=2
     )
@@ -447,7 +464,8 @@ def make_shell_companies_analysis(dataset):
             name='Illegal (Rate)',
             marker_color='#E74C3C',
             opacity=0.8,
-            showlegend=False
+            showlegend=False,
+            legendgroup='Illegal'
         ),
         row=2, col=2
     )

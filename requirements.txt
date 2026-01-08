@@ -9,3 +9,4 @@ gunicorn
 dash-bootstrap-components
 scikit-learn
 scipy
+statsmodels

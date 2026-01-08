@@ -85,7 +85,7 @@ def make_info_folium_map(clean_data_illegal, geo_data, map_illegal_data, map_tra
     ).add_to(map)
 
     # Combined layer with both pie charts and bar charts in popups
-    fg_markers = folium.FeatureGroup(name="📊📈 Country Analysis (Combined Charts)")
+    fg_markers = folium.FeatureGroup(name=" Country Analysis (Combined Charts)")
     
     for country, ratio in map_illegal_data.items():
         geometry = geo_data[geo_data['admin'] == country].geometry

@@ -12,7 +12,50 @@ from visualizations.industrial_plots import (
 
 
 def register_industrial_callbacks(app):
-    """Register all industrial analysis callbacks"""
+    from dash.dependencies import State
+    @app.callback(
+        Output('sarima-predictor-graph', 'figure'),
+        Output('sarima-nclicks-store', 'data'),
+        Input('sarima-country-dropdown', 'value'),
+        Input('sarima-industry-dropdown', 'value'),
+        Input('sarima-date-range-picker', 'start_date'),
+        Input('sarima-date-range-picker', 'end_date'),
+        Input('sarima-prediction-periods', 'value'),
+        Input('sarima-run-button', 'n_clicks'),
+        State('sarima-nclicks-store', 'data')
+    )
+    def update_sarima_predictor(selected_country, selected_industries, train_start, train_end, forecast_periods, n_clicks, last_n_clicks):
+        data_manager = app.data_manager
+        data = data_manager.get_data()
+        if not selected_country or not selected_industries or not train_start or not train_end or not forecast_periods:
+            return {"layout": {"title": "Select all parameters for SARIMA prediction."}}, n_clicks
+        if isinstance(selected_industries, str):
+            selected_industries = [selected_industries]
+        import plotly.graph_objects as go
+        import pandas as pd
+        # Always show the train time series
+        df = data.copy()
+        df = df[(df['Country'] == selected_country) & (df['Industry'].isin(selected_industries))]
+        df['Date'] = pd.to_datetime(df['Date'])
+        df = df.sort_values('Date')
+        mask = (df['Date'] >= pd.to_datetime(train_start)) & (df['Date'] <= pd.to_datetime(train_end))
+        train_df = df.loc[mask]
+        ts = train_df.groupby('Date')['Amount (USD)'].sum().asfreq('D').fillna(0)
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=ts.index, y=ts.values, mode='lines+markers', name='Train Data'))
+        fig.update_layout(
+            title=f'SARIMA Spend Prediction ({selected_country}, {", ".join(selected_industries)})',
+            xaxis_title='Date',
+            yaxis_title='Amount (USD)',
+            template='plotly_white',
+            height=500
+        )
+        # Only run SARIMA if button pressed and n_clicks increased
+        if n_clicks and last_n_clicks is not None and n_clicks > last_n_clicks:
+            from visualizations.industrial_plots import make_sarima_predictor_figure
+            return make_sarima_predictor_figure(data, selected_country, selected_industries, train_start, train_end, forecast_periods), n_clicks
+        # If widgets changed, reset store to current n_clicks (so next click triggers SARIMA)
+        return fig, n_clicks
     
     @app.callback(
         Output('normalize-button', 'children'),

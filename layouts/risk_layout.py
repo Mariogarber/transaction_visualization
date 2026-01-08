@@ -12,7 +12,7 @@ def create_risk_layout(data):
         create_navigation_bar('risk'),
         
         html.Div([
-            html.H1("⚠️ Risk Analysis", 
+            html.H1(" Risk Analysis", 
                    style={'marginBottom': '30px', 'fontSize': '50px', 'fontWeight': '700', 'textAlign': 'center', 'color': '#9b59b6'}),
             
             html.P([
@@ -32,7 +32,7 @@ def create_risk_layout(data):
             
             # Risk Distribution Analysis
             html.Div([
-                html.H2("📊 Risk Score Distribution Analysis", 
+                html.H2(" Risk Score Distribution Analysis", 
                         style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
                 html.P("Comprehensive analysis of money laundering risk score distributions across legal and illegal transactions.",
                       style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
@@ -41,14 +41,14 @@ def create_risk_layout(data):
             
             # Transaction Amount Analysis
             html.Div([
-                html.H2("💰 Transaction Amount vs Risk Analysis", 
+                html.H2(" Transaction Amount vs Risk Analysis", 
                         style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
                 html.P("Interactive scatter plot showing correlations between transaction amounts, risk scores, and other factors.",
                       style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
                 
                 # Industry Selection Panel
                 html.Div([
-                    html.Label("🏭 Select Industries to Analyze:", 
+                    html.Label(" Select Industries to Analyze:", 
                               style={'fontSize': '18px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '10px'}),
                     dcc.Checklist(
                         id='industry-selection-risk',
@@ -78,7 +78,7 @@ def create_risk_layout(data):
                             style={'marginRight': '10px'}
                         ),
                         dbc.Button(
-                            "🎯 Reduce Samples", 
+                            " Reduce Samples", 
                             id="toggle-clustering-risk", 
                             color="warning", 
                             size="sm",
@@ -98,7 +98,7 @@ def create_risk_layout(data):
             
             # Shell Companies Analysis
             html.Div([
-                html.H2("🏢 Shell Companies Analysis", 
+                html.H2(" Shell Companies Analysis", 
                         style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
                 html.P("Detailed analysis of shell company usage patterns across different industries and transaction types.",
                       style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
@@ -107,7 +107,7 @@ def create_risk_layout(data):
             
             # Tax Haven Flow Analysis
             html.Div([
-                html.H2("🏝️ Tax Haven Flow Analysis", 
+                html.H2(" Tax Haven Flow Analysis", 
                         style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
                 html.P("Sankey diagram showing money flows from source countries through destinations to tax havens.",
                       style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),

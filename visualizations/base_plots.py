@@ -45,7 +45,7 @@ def make_cards_for_industries(filtered_data,
                                style={'color': '#e74c3c', 'fontSize': '20px'})
                 ], style={'marginBottom': '10px'}),
                 html.P([
-                    html.Span("📊 ", style={'fontSize': '16px'}),
+                    html.Span("📊", style={'fontSize': '16px'}),
                     f"{row['Transaction_Count']} transactions"
                 ], style={'color': '#5a6c7d', 'marginBottom': '0'})
             ])

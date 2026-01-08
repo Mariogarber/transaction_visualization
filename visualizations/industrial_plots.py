@@ -6,6 +6,8 @@ from plotly.subplots import make_subplots
 import plotly.express as px
 import numpy as np
 import pandas as pd
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from datetime import timedelta
 
 
 # Color mappings
@@ -78,6 +80,73 @@ def _normalize_color_for_plotly(color):
         return c
     # already rgb(...) or rgba(...) or named color -> return as is
     return c
+
+# --- SARIMA predictor plot ---
+def make_sarima_predictor_figure(dataset, selected_country, selected_industries, train_start, train_end, forecast_periods=12):
+    """
+    Create a SARIMA prediction plot for spend money time series.
+    Filters by country, industries, and date range for training.
+    """
+    # Filter data
+    df = dataset.copy()
+    df = df[(df['Country'] == selected_country) & (df['Industry'].isin(selected_industries))]
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = df.sort_values('Date')
+    # Filter by train period
+    mask = (df['Date'] >= pd.to_datetime(train_start)) & (df['Date'] <= pd.to_datetime(train_end))
+    train_df = df.loc[mask]
+    # Aggregate by date
+    ts = train_df.groupby('Date')['Amount (USD)'].sum().asfreq('D').fillna(0)
+    # If not enough data, return empty fig
+    if len(ts) < 10:
+        return go.Figure(layout={"title": "Not enough data for SARIMA prediction."})
+    # Fit SARIMA (simple order, can be improved)
+    try:
+        model = SARIMAX(ts, order=(1,1,1), seasonal_order=(1,1,1,7), enforce_stationarity=False, enforce_invertibility=False)
+        results = model.fit(disp=False)
+        forecast = results.get_forecast(steps=forecast_periods)
+        pred_ci = forecast.conf_int()
+        forecast_index = pd.date_range(ts.index[-1] + timedelta(days=1), periods=forecast_periods, freq='D')
+        forecast_values = forecast.predicted_mean.values.clip(min=0)
+        forecast_series = pd.Series(forecast_values, index=forecast_index)
+        # Clip confidence interval to 0
+        pred_ci_clipped = pred_ci.clip(lower=0)
+    except Exception as e:
+        return go.Figure(layout={"title": f"SARIMA error: {e}"})
+    # Connect train to forecast by appending first forecast point to train
+    train_x = list(ts.index) + [forecast_series.index[0]]
+    train_y = list(ts.values) + [forecast_series.values[0]]
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=train_x, y=train_y, mode='lines+markers', name='Train Data'))
+    fig.add_trace(go.Scatter(x=forecast_series.index, y=forecast_series.values, mode='lines+markers', name='Forecast'))
+    # Add confidence interval (clipped)
+    fig.add_traces([
+        go.Scatter(
+            x=forecast_index,
+            y=pred_ci_clipped.iloc[:, 0],
+            mode='lines',
+            line=dict(width=0),
+            showlegend=False
+        ),
+        go.Scatter(
+            x=forecast_index,
+            y=pred_ci_clipped.iloc[:, 1],
+            mode='lines',
+            fill='tonexty',
+            fillcolor='rgba(0,100,80,0.2)',
+            line=dict(width=0),
+            showlegend=True,
+            name='Confidence Interval'
+        )
+    ])
+    fig.update_layout(
+        title=f'SARIMA Spend Prediction ({selected_country}, {", ".join(selected_industries)})',
+        xaxis_title='Date',
+        yaxis_title='Amount (USD)',
+        template='plotly_white',
+        height=500
+    )
+    return fig
 
 
 def make_industry_bar_figure(dataset, visible_industries=None, palette='Plotly', height_per_item=48, min_height=420):
@@ -193,7 +262,6 @@ def make_industry_bar_figure(dataset, visible_industries=None, palette='Plotly',
     fig.update_traces(textfont=dict(size=16))
 
     return fig
-
 
 def make_stacked_illegal_legal(selected_country, normalize_clicks, dataset):
     """Create stacked bar chart of legal vs illegal transactions by industry"""
@@ -346,7 +414,6 @@ def make_stacked_illegal_legal(selected_country, normalize_clicks, dataset):
     fig.update_yaxes(title_text='Amount (Millions USD)', row=1, col=2)
 
     return fig
-
 
 def make_transaction_over_time(dataset, iso_a3_dict, selected_industries, country_selected, window_size):
     """Create transaction over time analysis with multiple visualizations"""

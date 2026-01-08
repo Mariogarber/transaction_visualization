@@ -60,8 +60,8 @@ def make_transaction_trends_analysis(dataset):
     # Create subplots
     fig = make_subplots(
         rows=2, cols=2,
-        subplot_titles=('📈 Monthly Transaction Volume ($)', '📊 Transaction Count by Type', 
-                       '💰 Average Amount by Type', '⚡ Risk Score Trends'),
+        subplot_titles=(' Monthly Transaction Volume ($)', ' Transaction Count by Type', 
+                       ' Average Amount by Type', ' Risk Score Trends'),
         specs=[[{"secondary_y": False}, {"secondary_y": False}],
                [{"secondary_y": False}, {"secondary_y": False}]]
     )
@@ -151,7 +151,7 @@ def make_transaction_trends_analysis(dataset):
     # Update layout
     fig.update_layout(
         height=700,
-        title_text="📈 Transaction Trends Analysis Over Time",
+        title_text=" Transaction Trends Analysis Over Time",
         title_font_size=24,
         showlegend=True,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
@@ -223,7 +223,7 @@ def make_correlation_analysis(dataset):
             )
     
     fig.update_layout(
-        title='🔗 Variable Correlation Analysis',
+        title=' Variable Correlation Analysis',
         title_font_size=20,
         width=600,
         height=500,
@@ -241,8 +241,8 @@ def make_amount_distribution_analysis(dataset):
     # Create subplots
     fig = make_subplots(
         rows=2, cols=2,
-        subplot_titles=('💰 Amount Distribution by Legality', '🏭 Amount by Industry', 
-                       '🏦 Amount by Transaction Type', '📊 Risk Score Distribution'),
+        subplot_titles=(' Amount Distribution by Legality', ' Amount by Industry', 
+                       ' Amount by Transaction Type', ' Risk Score Distribution'),
         specs=[[{"secondary_y": False}, {"secondary_y": False}],
                [{"secondary_y": False}, {"secondary_y": False}]]
     )
@@ -309,7 +309,7 @@ def make_amount_distribution_analysis(dataset):
     # Update layout
     fig.update_layout(
         height=700,
-        title_text="💰 Transaction Amount Distribution Analysis",
+        title_text=" Transaction Amount Distribution Analysis",
         title_font_size=24,
         showlegend=True,
         template='plotly_white'
@@ -364,7 +364,7 @@ def make_summary_statistics_table(dataset):
     # Create table figure
     fig = go.Figure(data=[go.Table(
         header=dict(
-            values=['📊 <b>Statistical Metric</b>', '📈 <b>Value</b>'],
+            values=[' <b>Statistical Metric</b>', ' <b>Value</b>'],
             fill_color='#4472C4',
             font=dict(color='white', size=14),
             align='left',
@@ -380,7 +380,7 @@ def make_summary_statistics_table(dataset):
     ])
     
     fig.update_layout(
-        title='📊 Summary Statistics Overview',
+        title=' Summary Statistics Overview',
         title_font_size=20,
         height=400,
         margin=dict(l=0, r=0, t=50, b=0),

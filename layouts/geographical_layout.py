@@ -12,7 +12,7 @@ def create_geographical_layout(data):
         create_navigation_bar('geographical'),
         
         html.Div([
-            html.H1("🗺️ Geographical Analysis", 
+            html.H1(" Geographical Analysis", 
                    style={'marginBottom': '30px', 'fontSize': '50px', 'fontWeight': '700', 'textAlign': 'center', 'color': '#3498db'}),
             
             html.P([
@@ -31,7 +31,7 @@ def create_geographical_layout(data):
 
             # Reported Transactions Map
             html.Div([
-                html.H3("🌍 Reported Transactions Map", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
+                html.H3(" Reported Transactions Map", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
                 html.P("Overview of reported transactions by country with detailed statistics.",
                     style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '18px', 'lineHeight': '1.6',
                             'marginBottom': '20px'}),
@@ -40,7 +40,7 @@ def create_geographical_layout(data):
 
             # Transaction Flux Map
             html.Div([
-                html.H3("↔️ Transaction Flux Map", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
+                html.H3("↔ Transaction Flux Map", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
                 html.P("Select a country to view its transactions with other countries over a time period. You can also filter by transaction type. Each arrow represents the aggregate transactions for the selected period.",
                     style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '18px', 'lineHeight': '1.6',
                             'marginBottom': '20px'}),
@@ -101,7 +101,7 @@ def create_geographical_layout(data):
             
             # Risk Score Choropleth Map
             html.Div([
-                html.H3("🎯 Risk Score by Country", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
+                html.H3(" Risk Score by Country", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
                 html.P("Interactive world map showing average money laundering risk scores by country. Darker colors indicate higher risk levels.",
                     style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '18px', 'lineHeight': '1.6',
                             'marginBottom': '20px'}),

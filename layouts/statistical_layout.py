@@ -12,7 +12,7 @@ def create_statistical_layout(data):
         create_navigation_bar('statistical'),
         
         html.Div([
-            html.H1("📊 Statistical Overview", 
+            html.H1(" Statistical Overview", 
                    style={'marginBottom': '30px', 'fontSize': '50px', 'fontWeight': '700', 'textAlign': 'center', 'color': '#e74c3c'}),
             
             html.P([
@@ -31,7 +31,7 @@ def create_statistical_layout(data):
 
             # Date Range and Country Selection
             html.Div([
-                html.H3("📅 Filter Controls", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
+                html.H3(" Filter Controls", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
                 
                 dbc.Row([
                     dbc.Col([
@@ -60,7 +60,7 @@ def create_statistical_layout(data):
 
             # Overview Cards
             html.Div([
-                html.H3("📈 Key Metrics", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
+                html.H3(" Key Metrics", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
                 dbc.Row([
                     dbc.Col([
                         dbc.Card([
@@ -83,13 +83,13 @@ def create_statistical_layout(data):
 
             # Industry Cards
             html.Div([
-                html.H3("🏢 Industry Distribution", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
+                html.H3(" Industry Distribution", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
                 html.Div(id='industry-cards')
             ], style={'backgroundColor': '#f8f9fa', 'padding': '25px', 'borderRadius': '10px', 'marginBottom': '30px'}),
             
             # Time Trends Analysis
             html.Div([
-                html.H3("📈 Transaction Trends Over Time", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
+                html.H3(" Transaction Trends Over Time", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
                 html.P("Analysis of transaction patterns, volumes, and risk scores over monthly periods.",
                       style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '16px', 'marginBottom': '20px'}),
                 dcc.Graph(id='trends-analysis')
@@ -100,7 +100,7 @@ def create_statistical_layout(data):
                 # Correlation Analysis
                 dbc.Col([
                     html.Div([
-                        html.H3("🔗 Variable Correlations", style={'marginBottom': '20px', 'fontSize': '24px', 'fontWeight': '700'}),
+                        html.H3(" Variable Correlations", style={'marginBottom': '20px', 'fontSize': '24px', 'fontWeight': '700'}),
                         html.P("Correlation matrix showing relationships between key variables.",
                               style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '14px', 'marginBottom': '15px'}),
                         dcc.Graph(id='correlation-analysis')
@@ -110,7 +110,7 @@ def create_statistical_layout(data):
                 # Summary Statistics
                 dbc.Col([
                     html.Div([
-                        html.H3("📊 Summary Statistics", style={'marginBottom': '20px', 'fontSize': '24px', 'fontWeight': '700'}),
+                        html.H3(" Summary Statistics", style={'marginBottom': '20px', 'fontSize': '24px', 'fontWeight': '700'}),
                         html.P("Comprehensive statistical overview of the dataset.",
                               style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '14px', 'marginBottom': '15px'}),
                         dcc.Graph(id='summary-statistics')
@@ -120,7 +120,7 @@ def create_statistical_layout(data):
             
             # Amount Distribution Analysis
             html.Div([
-                html.H3("💰 Transaction Amount Analysis", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
+                html.H3(" Transaction Amount Analysis", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
                 html.P("Distribution analysis of transaction amounts across different types and patterns.",
                       style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '16px', 'marginBottom': '20px'}),
                 dcc.Graph(id='amount-distribution-analysis')
