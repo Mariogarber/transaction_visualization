@@ -7,10 +7,91 @@ from layouts.base_layout import create_navigation_bar
 
 
 def create_risk_layout(data):
-    """Create the risk analysis page layout"""
+    # Shell Companies Network Graph section
+    shell_network_section = html.Div([
+        html.H2("Shell Companies Network Graph", style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
+        html.P("Interactive network graph showing relationships between people, shell companies, and countries. Edge labels represent risk scores. Use the filters to explore the network. The 'Top N Transactions by Amount' filter limits the graph to the largest transactions.",
+                style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
+        dbc.Row([
+            dbc.Col([
+                html.Label("Filter by Country:", style={'fontWeight': '600', 'fontSize': '16px', 'marginBottom': '5px'}),
+                dcc.Dropdown(
+                    id='network-country-dropdown',
+                    options=[{'label': c, 'value': c} for c in sorted(data['Country'].unique())],
+                    multi=True,
+                    placeholder="Select countries (optional)",
+                    style={'marginBottom': '15px'}
+                )
+            ], width=4),
+            dbc.Col([
+                html.Label("Filter by Industry:", style={'fontWeight': '600', 'fontSize': '16px', 'marginBottom': '5px'}),
+                dcc.Dropdown(
+                    id='network-industry-dropdown',
+                    options=[{'label': i, 'value': i} for i in sorted(data['Industry'].unique())],
+                    multi=True,
+                    placeholder="Select industries (optional)",
+                    style={'marginBottom': '15px'}
+                )
+            ], width=4),
+            dbc.Col([
+                html.Label("Transaction Amount Range:", style={'fontWeight': '600', 'fontSize': '16px', 'marginBottom': '5px'}),
+                dcc.RangeSlider(
+                    id='network-amount-slider',
+                    min=float(data['Amount (USD)'].min()),
+                    max=float(data['Amount (USD)'].max()),
+                    step=1000,
+                    value=[float(data['Amount (USD)'].quantile(0.05)), float(data['Amount (USD)'].quantile(0.95))],
+                    marks={
+                        int(data['Amount (USD)'].min()): f"${int(data['Amount (USD)'].min()):,}",
+                        int(data['Amount (USD)'].max()): f"${int(data['Amount (USD)'].max()):,}"
+                    },
+                    tooltip={"placement": "bottom", "always_visible": True},
+                    allowCross=False,
+                    pushable=1000,
+                    updatemode='mouseup',
+                ),
+                html.Div("Note: Only the first 200 transactions in the selected range will be shown for performance.", style={'fontSize': '12px', 'color': '#888', 'marginTop': '5px'})
+            ], width=4),
+            dbc.Col([
+                html.Label("Number of Transactions to Show (max 250):", style={'fontWeight': '600', 'fontSize': '16px', 'marginBottom': '5px'}),
+                dcc.Input(
+                    id='network-top-n-input',
+                    type='number',
+                    min=1,
+                    max=250,
+                    step=1,
+                    value=25,
+                    style={'width': '100%', 'marginBottom': '15px'}
+                ),
+            ], width=4)
+        ], style={'marginBottom': '10px'}),
+        html.Label("Filter edges by risk score:", style={'fontWeight': '600', 'fontSize': '16px', 'marginBottom': '10px'}),
+        html.Div([
+            dcc.RangeSlider(
+                id='network-risk-slider',
+                min=0, max=10, step=1, value=[0, 10],
+                marks={i: str(i) for i in range(0, 11)},
+                tooltip={"placement": "bottom", "always_visible": True},
+                allowCross=False,
+                pushable=1,
+                updatemode='mouseup',
+            )
+        ], style={'marginBottom': '30px'}),
+        dcc.Loading(
+            id='loading-shell-network',
+            children=[
+                html.Div([
+                    html.Div(id='shell-network-graph-container')
+                ])
+            ],
+            type='circle',
+            color="#9b59b6"
+        )
+    ], style={'marginBottom': '50px', 'backgroundColor': '#f8f9fa', 'padding': '30px', 'borderRadius': '10px'})
+
+    # Now return the layout including the network section
     return html.Div([
         create_navigation_bar('risk'),
-        
         html.Div([
             html.H1(" Risk Analysis", 
                    style={'marginBottom': '30px', 'fontSize': '50px', 'fontWeight': '700', 'textAlign': 'center', 'color': '#9b59b6'}),
@@ -34,16 +115,16 @@ def create_risk_layout(data):
             html.Div([
                 html.H2(" Risk Score Distribution Analysis", 
                         style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
-                html.P("Comprehensive analysis of money laundering risk score distributions across legal and illegal transactions.",
+                html.P("Shows the distribution of money laundering risk scores for all transactions. Use this to identify the prevalence of high-risk activity.",
                       style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
                 dcc.Graph(id='risk-distribution-plot')
             ], style={'marginBottom': '50px', 'backgroundColor': '#f8f9fa', 'padding': '30px', 'borderRadius': '10px'}),
             
-            # Transaction Amount Analysis
-            html.Div([
+                # Transaction Amount Analysis
+                html.Div([
                 html.H2(" Transaction Amount vs Risk Analysis", 
-                        style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
-                html.P("Interactive scatter plot showing correlations between transaction amounts, risk scores, and other factors.",
+                    style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
+                html.P("Scatter plot showing how transaction amounts relate to risk scores and other factors. Use industry selection to focus the analysis.",
                       style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
                 
                 # Industry Selection Panel
@@ -78,7 +159,7 @@ def create_risk_layout(data):
                             style={'marginRight': '10px'}
                         ),
                         dbc.Button(
-                            " Reduce Samples", 
+                            "Reduce Samples", 
                             id="toggle-clustering-risk", 
                             color="warning", 
                             size="sm",
@@ -97,10 +178,11 @@ def create_risk_layout(data):
             ], style={'marginBottom': '50px', 'backgroundColor': '#f8f9fa', 'padding': '30px', 'borderRadius': '10px'}),
             
             # Shell Companies Analysis
+            shell_network_section,
             html.Div([
                 html.H2(" Shell Companies Analysis", 
                         style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
-                html.P("Detailed analysis of shell company usage patterns across different industries and transaction types.",
+                html.P("Shows how shell companies are used in transactions, broken down by industry and transaction type. Useful for spotting suspicious patterns.",
                       style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
                 dcc.Graph(id='shell-companies-plot')
             ], style={'marginBottom': '50px', 'backgroundColor': '#f8f9fa', 'padding': '30px', 'borderRadius': '10px'}),
@@ -109,7 +191,7 @@ def create_risk_layout(data):
             html.Div([
                 html.H2(" Tax Haven Flow Analysis", 
                         style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
-                html.P("Sankey diagram showing money flows from source countries through destinations to tax havens.",
+                html.P("Sankey diagram visualizing the flow of money from source countries, through destinations, and into tax havens. Helps identify major routes and suspicious flows.",
                       style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
                 dcc.Graph(id='tax-haven-flow-plot')
             ], style={'marginBottom': '50px', 'backgroundColor': '#f8f9fa', 'padding': '30px', 'borderRadius': '10px'}),

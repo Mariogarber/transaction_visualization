@@ -8,6 +8,9 @@ import dash_bootstrap_components as dbc
 def create_main_layout():
     """Create the main landing page with project explanation and navigation buttons"""
     return html.Div([
+        # Navigation bar (so nav-main exists in layout)
+        create_navigation_bar('main'),
+
         # Header
         html.H1(
             "Money Transactions Analytics Dashboard",
@@ -58,6 +61,32 @@ def create_main_layout():
                 'fontWeight': '300'
             }
             ),
+
+            html.H3("Dataset Columns & Meanings", style={'textAlign': 'center', 'marginTop': '30px', 'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700', 'color': '#2c3e50'}),
+            html.Table([
+                html.Thead([
+                    html.Tr([
+                        html.Th("Column Name", style={'fontSize': '18px', 'fontWeight': '600', 'color': '#34495e'}),
+                        html.Th("Description", style={'fontSize': '18px', 'fontWeight': '600', 'color': '#34495e'})
+                    ])
+                ]),
+                html.Tbody([
+                    html.Tr([html.Td("Transaction ID"), html.Td("Unique identifier for each transaction")]),
+                    html.Tr([html.Td("Country"), html.Td("Country where the transaction originated")]),
+                    html.Tr([html.Td("Amount (USD)"), html.Td("Transaction amount in US dollars")]),
+                    html.Tr([html.Td("Transaction Type"), html.Td("Type/category of transaction (e.g., transfer, deposit)")]),
+                    html.Tr([html.Td("Date of Transaction"), html.Td("Date when the transaction occurred")]),
+                    html.Tr([html.Td("Person Involved"), html.Td("Name or identifier of the person involved")]),
+                    html.Tr([html.Td("Industry"), html.Td("Industry sector related to the transaction")]),
+                    html.Tr([html.Td("Destination Country"), html.Td("Country where the money was sent")]),
+                    html.Tr([html.Td("Reported by Authority"), html.Td("Whether the transaction was reported by an authority")]),
+                    html.Tr([html.Td("Source of Money"), html.Td("Origin/source of the funds")]),
+                    html.Tr([html.Td("Money Laundering Risk Score"), html.Td("Risk score for potential money laundering")]),
+                    html.Tr([html.Td("Shell Companies Involved"), html.Td("Number/names of shell companies involved")]),
+                    html.Tr([html.Td("Financial Institution"), html.Td("Bank or financial institution handling the transaction")]),
+                    html.Tr([html.Td("Tax Haven Country"), html.Td("Country considered a tax haven in the transaction")]),
+                ])
+            ], style={'width': '100%', 'margin': '0 auto 40px auto', 'borderCollapse': 'collapse', 'fontSize': '16px', 'backgroundColor': '#f8f9fa', 'boxShadow': '0 2px 8px rgba(0,0,0,0.05)'}),
         ], 
         style={
             'backgroundColor': '#f8f9fa',
@@ -167,7 +196,7 @@ def create_main_layout():
         html.Div([
             html.Hr(style={'marginTop': '60px', 'marginBottom': '30px', 'border': '2px solid #bdc3c7'}),
             html.P([
-                "💡 Tip: Each section provides interactive controls to filter data by date range, countries, and other parameters. ",
+                "Tip: Each section provides interactive controls to filter data by date range, countries, and other parameters. ",
                 "Use the navigation bar at the top to switch between different analysis perspectives."
             ],
             style={
@@ -176,19 +205,32 @@ def create_main_layout():
                 'fontSize': '18px',
                 'fontStyle': 'italic',
                 'lineHeight': '1.6'
-            })
+            }),
+            html.Hr(style={'marginTop': '30px', 'marginBottom': '20px', 'border': '1px solid #bdc3c7'}),
+            html.Div([
+                html.P([
+                    "Authors: Mario García Berenguer and Eder Tarifa Fernández"
+                ],
+                style={
+                    'textAlign': 'center',
+                    'color': '#2c3e50',
+                    'fontSize': '16px',
+                    'fontWeight': '500',
+                    'marginBottom': '10px'
+                })
+            ])
         ])
-        
     ], style={'padding': '40px 60px', 'backgroundColor': '#ffffff'})
 
 
 def create_navigation_bar(active_section=None):
     """Create the navigation bar for all pages"""
     nav_items = [
-        {"id": "nav-statistical", "label": "📊 Statistical", "color": "danger"},
-        {"id": "nav-geographical", "label": "🗺️ Geographical", "color": "primary"}, 
-        {"id": "nav-industrial", "label": "🏢 Industrial", "color": "success"},
-        {"id": "nav-risk-analysis", "label": "⚠️ Risk Analysis", "color": "warning"}
+           {"id": "nav-main", "label": "🏠 Home", "color": "secondary"},
+           {"id": "nav-statistical", "label": "📊 Statistical", "color": "danger"},
+           {"id": "nav-geographical", "label": "🗺️ Geographical", "color": "primary"}, 
+           {"id": "nav-industrial", "label": "🏢 Industrial", "color": "success"},
+           {"id": "nav-risk-analysis", "label": "⚠️ Risk Analysis", "color": "warning"}
     ]
     
     buttons = []

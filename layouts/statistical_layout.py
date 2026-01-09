@@ -35,7 +35,7 @@ def create_statistical_layout(data):
                 
                 dbc.Row([
                     dbc.Col([
-                        html.Label("Date Range:", style={'fontWeight': '700', 'marginBottom': '10px', 'fontSize': '18px'}),
+                        html.Label("📅 Date Range:", style={'fontWeight': '700', 'marginBottom': '10px', 'fontSize': '18px'}),
                         dcc.DatePickerRange(
                             id='date-range-picker',
                             start_date=data['Date'].min(),
@@ -61,6 +61,7 @@ def create_statistical_layout(data):
             # Overview Cards
             html.Div([
                 html.H3(" Key Metrics", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
+                html.P("These cards show the total number of transactions and the total amount moved in USD for the selected filters.", style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '15px', 'marginBottom': '15px'}),
                 dbc.Row([
                     dbc.Col([
                         dbc.Card([
@@ -84,13 +85,14 @@ def create_statistical_layout(data):
             # Industry Cards
             html.Div([
                 html.H3(" Industry Distribution", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
+                html.P("Shows the distribution of transactions across different industry sectors.", style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '15px', 'marginBottom': '15px'}),
                 html.Div(id='industry-cards')
             ], style={'backgroundColor': '#f8f9fa', 'padding': '25px', 'borderRadius': '10px', 'marginBottom': '30px'}),
             
             # Time Trends Analysis
             html.Div([
                 html.H3(" Transaction Trends Over Time", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
-                html.P("Analysis of transaction patterns, volumes, and risk scores over monthly periods.",
+                html.P("Visualizes how transaction volume and risk scores change over time, helping to spot trends and anomalies.",
                       style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '16px', 'marginBottom': '20px'}),
                 dcc.Graph(id='trends-analysis')
             ], style={'backgroundColor': '#f8f9fa', 'padding': '25px', 'borderRadius': '10px', 'marginBottom': '30px'}),
@@ -101,7 +103,7 @@ def create_statistical_layout(data):
                 dbc.Col([
                     html.Div([
                         html.H3(" Variable Correlations", style={'marginBottom': '20px', 'fontSize': '24px', 'fontWeight': '700'}),
-                        html.P("Correlation matrix showing relationships between key variables.",
+                        html.P("Displays the correlation matrix to show how variables like amount, risk score, and others relate to each other.",
                               style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '14px', 'marginBottom': '15px'}),
                         dcc.Graph(id='correlation-analysis')
                     ], style={'backgroundColor': '#f8f9fa', 'padding': '20px', 'borderRadius': '10px', 'height': '100%'})
@@ -111,7 +113,7 @@ def create_statistical_layout(data):
                 dbc.Col([
                     html.Div([
                         html.H3(" Summary Statistics", style={'marginBottom': '20px', 'fontSize': '24px', 'fontWeight': '700'}),
-                        html.P("Comprehensive statistical overview of the dataset.",
+                        html.P("Shows key summary statistics (mean, median, etc.) for the main numerical columns in the dataset.",
                               style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '14px', 'marginBottom': '15px'}),
                         dcc.Graph(id='summary-statistics')
                     ], style={'backgroundColor': '#f8f9fa', 'padding': '20px', 'borderRadius': '10px'})
@@ -121,7 +123,7 @@ def create_statistical_layout(data):
             # Amount Distribution Analysis
             html.Div([
                 html.H3(" Transaction Amount Analysis", style={'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700'}),
-                html.P("Distribution analysis of transaction amounts across different types and patterns.",
+                html.P("Shows the distribution of transaction amounts, helping to identify typical values and outliers.",
                       style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '16px', 'marginBottom': '20px'}),
                 dcc.Graph(id='amount-distribution-analysis')
             ], style={'backgroundColor': '#f8f9fa', 'padding': '25px', 'borderRadius': '10px', 'marginBottom': '30px'})

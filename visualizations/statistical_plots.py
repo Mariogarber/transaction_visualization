@@ -77,6 +77,7 @@ def make_transaction_trends_analysis(dataset):
             y=legal_data['Total_Amount'] / 1e6,
             mode='lines+markers',
             name='Legal Transactions',
+            legendgroup='Legal',
             line=dict(color='#2E8B57', width=3),
             marker=dict(size=8)
         ), row=1, col=1)
@@ -87,6 +88,7 @@ def make_transaction_trends_analysis(dataset):
             y=illegal_data['Total_Amount'] / 1e6,
             mode='lines+markers',
             name='Illegal Transactions',
+            legendgroup='Illegal',
             line=dict(color='#DC143C', width=3),
             marker=dict(size=8)
         ), row=1, col=1)
@@ -97,7 +99,8 @@ def make_transaction_trends_analysis(dataset):
             x=legal_data['Year_Month_Str'],
             y=legal_data['Count'],
             name='Legal Count',
-            marker_color='#4682B4',
+            legendgroup='Legal',
+            marker_color='#32CD32',
             opacity=0.8,
             showlegend=False
         ), row=1, col=2)
@@ -107,6 +110,7 @@ def make_transaction_trends_analysis(dataset):
             x=illegal_data['Year_Month_Str'],
             y=illegal_data['Count'],
             name='Illegal Count',
+            legendgroup='Illegal',
             marker_color='#CD5C5C',
             opacity=0.8,
             showlegend=False
@@ -119,6 +123,7 @@ def make_transaction_trends_analysis(dataset):
             y=legal_data['Avg_Amount'] / 1e6,
             mode='lines+markers',
             name='Avg Legal',
+            legendgroup='Legal',
             line=dict(color='#32CD32', width=2, dash='dash'),
             showlegend=False
         ), row=2, col=1)
@@ -129,6 +134,7 @@ def make_transaction_trends_analysis(dataset):
             y=illegal_data['Avg_Amount'] / 1e6,
             mode='lines+markers',
             name='Avg Illegal',
+            legendgroup='Illegal',
             line=dict(color='#FF6347', width=2, dash='dash'),
             showlegend=False
         ), row=2, col=1)

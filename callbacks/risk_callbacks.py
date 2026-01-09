@@ -1,7 +1,7 @@
 """
 Risk analysis callbacks.
 """
-from dash import Input, Output, State, no_update, callback_context
+from dash import Input, Output, State, no_update, callback_context, html
 from data.data_manager import DataManager
 from visualizations.risk_plots import (
     make_risk_distribution_analysis,
@@ -12,7 +12,48 @@ from visualizations.risk_plots import (
 
 
 def register_risk_callbacks(app):
-    """Register all risk analysis callbacks"""
+
+    import dash_cytoscape as cyto
+    from visualizations.shell_network import make_shell_network_elements
+
+    @app.callback(
+        Output('shell-network-graph-container', 'children'),
+        Input('network-risk-slider', 'value'),
+        Input('industry-selection-risk', 'value'),
+        Input('network-country-dropdown', 'value'),
+        Input('network-industry-dropdown', 'value'),
+        Input('network-amount-slider', 'value'),
+        Input('network-top-n-input', 'value'),
+    )
+    def update_shell_network_graph(risk_range, selected_industries, filter_countries, filter_industries, amount_range, top_n):
+        data_manager = app.data_manager
+        dataset = data_manager.get_data()
+        # Filter by main industry selection
+        if selected_industries:
+            dataset = dataset[dataset['Industry'].isin(selected_industries)]
+        # Optional country filter
+        if filter_countries:
+            dataset = dataset[dataset['Country'].isin(filter_countries)]
+        # Optional industry filter
+        if filter_industries:
+            dataset = dataset[dataset['Industry'].isin(filter_industries)]
+        # Filter by amount range
+        if amount_range:
+            dataset = dataset[(dataset['Amount (USD)'] >= amount_range[0]) & (dataset['Amount (USD)'] <= amount_range[1])]
+        # Limit to user-selected number of transactions (max 250)
+        if not top_n or top_n > 250:
+            top_n = 250
+        dataset = dataset.head(top_n)
+        elements, stylesheet = make_shell_network_elements(dataset, risk_range)
+        if not elements:
+            return html.Div("No network data for selected filters.", style={'textAlign': 'center', 'color': '#888', 'fontSize': '18px', 'margin': '30px'})
+        return cyto.Cytoscape(
+            id='shell-network-graph',
+            elements=elements,
+            layout={'name': 'cose'},
+            stylesheet=stylesheet,
+            style={'width': '100%', 'height': '600px', 'background': '#f8f9fa', 'borderRadius': '10px', 'boxShadow': '0 2px 8px rgba(0,0,0,0.05)'}
+        )
     
     @app.callback(
         Output('risk-distribution-plot', 'figure'),

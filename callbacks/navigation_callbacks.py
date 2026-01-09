@@ -18,11 +18,13 @@ def register_navigation_callbacks(app):
         from layouts.industrial_layout import create_industrial_layout
         from layouts.risk_layout import create_risk_layout
         from layouts.base_layout import create_main_layout
-        
+
         data_manager = app.data_manager
         data = data_manager.get_data()
-        
-        if pathname == '/statistical' or pathname == '/':
+
+        if pathname == '/' or pathname == '/main':
+            return create_main_layout()
+        elif pathname == '/statistical':
             return create_statistical_layout(data)
         elif pathname == '/geographical':
             return create_geographical_layout(data)
@@ -31,16 +33,17 @@ def register_navigation_callbacks(app):
         elif pathname == '/risk':
             return create_risk_layout(data)
         else:
-            return create_statistical_layout(data)
+            return create_main_layout()
 
     @app.callback(
         Output('url', 'pathname'),
-        Input('nav-statistical', 'n_clicks'),
-        Input('nav-geographical', 'n_clicks'),
-        Input('nav-industrial', 'n_clicks'),
-        Input('nav-risk-analysis', 'n_clicks')
+            Input('nav-main', 'n_clicks'),
+            Input('nav-statistical', 'n_clicks'),
+            Input('nav-geographical', 'n_clicks'),
+            Input('nav-industrial', 'n_clicks'),
+            Input('nav-risk-analysis', 'n_clicks')
     )
-    def navigate_pages(nav_statistical_clicks, nav_geographical_clicks, nav_industrial_clicks, nav_risk_clicks):
+    def navigate_pages(nav_main_clicks, nav_statistical_clicks, nav_geographical_clicks, nav_industrial_clicks, nav_risk_clicks):
         """Handle navigation button clicks"""
         ctx = callback_context
         if not ctx.triggered:
@@ -48,6 +51,8 @@ def register_navigation_callbacks(app):
         
         trigger_id = ctx.triggered[0]['prop_id'].split('.')[0]
         
+        if trigger_id == 'nav-main':
+                return '/'
         if trigger_id == 'nav-statistical':
             return '/statistical'
         elif trigger_id == 'nav-geographical':

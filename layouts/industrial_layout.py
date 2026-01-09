@@ -28,7 +28,7 @@ def create_industrial_layout(data):
             # Source of Transactions Section
             html.Div([
                 html.H3(" Source of Transactions", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
-
+                html.P("Shows the distribution of transaction amounts across industries for the selected country. Use normalization to compare relative activity between industries.", style={'color': '#5a6c7d', 'fontSize': '16px', 'marginBottom': '15px'}),
                 # Controls
                 dbc.Row([
                     dbc.Col([
@@ -51,7 +51,6 @@ def create_industrial_layout(data):
                         )
                     ], width=4)
                 ], style={'marginBottom': '20px'}),
-
                 # Industry Bar Chart
                 dcc.Loading(
                     id='loading-industry-bar-chart',
@@ -67,7 +66,7 @@ def create_industrial_layout(data):
             # --- Time Series Section ---
             html.Div([
                 html.H3(" Transactions Over Time", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
-                html.P("Track transaction trends across different industries and countries over time.",
+                html.P("Shows how transaction volumes change over time for selected industries and countries. Use the moving average slider to smooth the trends.",
                     style={'color': '#5a6c7d', 'fontSize': '18px', 'marginBottom': '20px'}),
 
                 # Controls
@@ -133,7 +132,7 @@ def create_industrial_layout(data):
             # --- SARIMA Predictor Section ---
             html.Div([
                 html.H3(" SARIMA Spend Predictor", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
-                html.P("Forecast future spend using SARIMA model. Select country, industries, and training period.",
+                html.P("Forecasts future transaction amounts using a SARIMA time series model. Select country, industries, and training period to generate predictions.",
                     style={'color': '#5a6c7d', 'fontSize': '18px', 'marginBottom': '20px'}),
                 dbc.Row([
                     dbc.Col([

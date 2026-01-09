@@ -32,7 +32,7 @@ def create_geographical_layout(data):
             # Reported Transactions Map
             html.Div([
                 html.H3(" Reported Transactions Map", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
-                html.P("Overview of reported transactions by country with detailed statistics.",
+                html.P("Shows the number and details of transactions reported by authorities in each country. Use this to identify countries with high reporting activity.",
                     style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '18px', 'lineHeight': '1.6',
                             'marginBottom': '20px'}),
                 html.Iframe(id='reported-map', style={'width': '100%', 'height': '500px', 'border': '1px solid #ccc', 'borderRadius': '8px'}),
@@ -41,7 +41,7 @@ def create_geographical_layout(data):
             # Transaction Flux Map
             html.Div([
                 html.H3("↔ Transaction Flux Map", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
-                html.P("Select a country to view its transactions with other countries over a time period. You can also filter by transaction type. Each arrow represents the aggregate transactions for the selected period.",
+                html.P("Visualizes the flow of money between countries. Arrows show the direction and volume of transactions, helping to spot major corridors and international activity.",
                     style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '18px', 'lineHeight': '1.6',
                             'marginBottom': '20px'}),
 
@@ -102,7 +102,7 @@ def create_geographical_layout(data):
             # Risk Score Choropleth Map
             html.Div([
                 html.H3(" Risk Score by Country", style={'marginBottom': '20px', 'fontSize': '35px', 'fontWeight': '700'}),
-                html.P("Interactive world map showing average money laundering risk scores by country. Darker colors indicate higher risk levels.",
+                html.P("Shows the average money laundering risk score for each country. Darker colors mean higher risk, helping to identify regions with greater risk exposure.",
                     style={'textAlign': 'left', 'color': '#5a6c7d', 'fontSize': '18px', 'lineHeight': '1.6',
                             'marginBottom': '20px'}),
                 

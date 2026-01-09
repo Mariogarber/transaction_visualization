@@ -48,7 +48,7 @@ def make_risk_distribution_analysis(dataset):
         go.Histogram(
             x=legal_data['Money Laundering Risk Score'],
             name='Legal',
-            marker_color='#3498DB',
+            marker_color='#32CD32',
             opacity=0.7,
             nbinsx=10,
             legendgroup='Legal',
@@ -62,7 +62,7 @@ def make_risk_distribution_analysis(dataset):
         go.Box(
             y=legal_data['Money Laundering Risk Score'],
             name='Legal',
-            marker_color='#3498DB',
+            marker_color='#32CD32',
             boxpoints='outliers',
             legendgroup='Legal',
             showlegend=False
@@ -240,7 +240,7 @@ def make_transaction_amount_analysis(dataset, use_clustering=False):
         symbol='Industry',
         size=size_column,
         hover_data=['Country', 'Destination Country', 'Transaction Type', 'Amount (USD)'],
-        color_discrete_map={'Legal': '#3498DB', 'Illegal': '#E74C3C'},
+        color_discrete_map={'Legal': '#32CD32', 'Illegal': '#E74C3C'},
         title=f'<b>Transaction Amount vs Risk Score Analysis{title_suffix}</b>',
         labels={
             'Money Laundering Risk Score': 'Money Laundering Risk Score',
@@ -268,7 +268,7 @@ def make_transaction_amount_analysis(dataset, use_clustering=False):
                     y=legal_p(x_trend),
                     mode='lines',
                     name='Legal Trend',
-                    line=dict(color='#3498DB', width=3, dash='dash')
+                    line=dict(color='#32CD32', width=3, dash='dash')
                 )
             )
         
@@ -365,7 +365,7 @@ def make_shell_companies_analysis(dataset):
             x=industries,
             y=shell_mean['Legal'] if 'Legal' in shell_mean.columns else [0]*len(industries),
             name='Legal (Avg)',
-            marker_color='#3498DB',
+            marker_color='#32CD32',
             opacity=0.8,
             legendgroup='Legal',
             showlegend=True
@@ -392,7 +392,7 @@ def make_shell_companies_analysis(dataset):
             x=industries,
             y=shell_total['Legal'] if 'Legal' in shell_total.columns else [0]*len(industries),
             name='Legal (Total)',
-            marker_color='#3498DB',
+            marker_color='#32CD32',
             opacity=0.8,
             showlegend=False,
             legendgroup='Legal'
@@ -419,7 +419,7 @@ def make_shell_companies_analysis(dataset):
             x=industries,
             y=count_trans['Legal'] if 'Legal' in count_trans.columns else [0]*len(industries),
             name='Legal (Count)',
-            marker_color='#3498DB',
+            marker_color='#32CD32',
             opacity=0.8,
             showlegend=False,
             legendgroup='Legal'
@@ -449,7 +449,7 @@ def make_shell_companies_analysis(dataset):
             x=industries,
             y=legal_rate,
             name='Legal (Rate)',
-            marker_color='#3498DB',
+            marker_color='#32CD32',
             opacity=0.8,
             showlegend=False,
             legendgroup='Legal'
