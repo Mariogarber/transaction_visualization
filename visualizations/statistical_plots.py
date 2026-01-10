@@ -213,7 +213,7 @@ def make_correlation_analysis(dataset):
         y=labels,
         colorscale='RdYlBu_r',
         zmid=0,
-        colorbar=dict(title="Correlation", titleside="right"),
+            colorbar=dict(title="Correlation"),
         hoverongaps=False,
         hovertemplate='<b>%{x}</b> vs <b>%{y}</b><br>Correlation: %{z:.3f}<extra></extra>'
     ))

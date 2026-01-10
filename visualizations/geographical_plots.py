@@ -184,7 +184,6 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
                 len=0.65,
                 x=0.92,
                 y=0.98,
-                yanchor='top',
                 outlinewidth=0,
                 tickformat=f",.{decimals}f"
             ),
