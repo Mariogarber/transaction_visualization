@@ -366,7 +366,6 @@ def make_risk_score_choropleth_map(dataset):
         customdata=country_risk[['Transaction_Count', 'Total_Amount']].values,
         colorbar=dict(
             title="Average<br>Risk Score",
-            titleside="top",
             tickmode="linear",
             tick0=1,
             dtick=1,
