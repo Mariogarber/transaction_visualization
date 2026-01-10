@@ -11,3 +11,4 @@ scikit-learn
 scipy
 statsmodels
 networkx
+dash_cytoscape
