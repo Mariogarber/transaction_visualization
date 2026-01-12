@@ -62,8 +62,8 @@ def make_info_folium_map(clean_data_illegal, geo_data, map_illegal_data, map_tra
     
     # Add multiple tile layers for better visualization
     folium.TileLayer('openstreetmap', name='OpenStreetMap').add_to(map)
-    folium.TileLayer('cartodbpositron', name='CartoDB Positron').add_to(map)
     folium.TileLayer('cartodbdark_matter', name='CartoDB Dark').add_to(map)
+    folium.TileLayer('cartodbpositron', name='CartoDB Positron').add_to(map)
     
     # Add fullscreen button
     Fullscreen().add_to(map)
@@ -175,34 +175,42 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
             text=text_admins,
             colorscale=[c[1] for c in colorscale],
             autocolorscale=False,
-            marker_line_color='white',
+            marker_line_color='#ffffff',
+            marker_line_width=0.8,
             zmin=zmin_m,
             zmax=zmax_m,
             colorbar=dict(
-                title=dict(text="<b>Flow Amount (Millions USD)</b>", font=dict(size=15, color="#000000")),
-                thickness=15,
-                len=0.65,
-                x=0.92,
-                y=0.98,
-                outlinewidth=0,
-                tickformat=f",.{decimals}f"
+                title=dict(text="<b>Flow Amount<br>(Millions USD)</b>", font=dict(size=14, color="#1a1a1a", family="Arial Black")),
+                thickness=20,
+                len=0.7,
+                x=0.93,
+                y=0.5,
+                xpad=10,
+                outlinewidth=2,
+                outlinecolor='#cccccc',
+                bgcolor='rgba(255,255,255,0.95)',
+                tickformat=f",.{decimals}f",
+                tickfont=dict(size=11, color="#333333"),
+                ticks='outside',
+                ticklen=5,
+                tickcolor='#999999'
             ),
             hoverinfo='text',
-            hovertemplate=f'%{{text}}<br>Flow Amount: %{{z:,.{decimals}f}} Millions (USD)<extra></extra>',
+            hovertemplate=f'<b>%{{text}}</b><br>Flow Amount: %{{z:,.{decimals}f}}M USD<extra></extra>',
             geo='geo',
             showscale=True,
             showlegend=False
         ))
 
         fig.update_layout(
-            margin=dict(l=0, r=170, t=30, b=0),
+            margin=dict(l=0, r=180, t=80, b=20),
             clickmode='none'
         )
 
     # --- Add arrows for flows ---
     traces = []
     
-    # Calculate normalization for arrow scaling
+    # Calculate normalization for arrow scaling - increased sizes
     if len(flows) > 0:
         flow_amounts = flows['amount']
         min_flow = flow_amounts.min()
@@ -211,11 +219,11 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
         
         def normalize_line_width(amount):
             normalized = (amount - min_flow) / flow_range
-            return 1 + normalized * 7
+            return 1 + normalized * 4
             
         def normalize_marker_size(amount):
             normalized = (amount - min_flow) / flow_range
-            return 4 + normalized * 16
+            return 6 + normalized * 10
     else:
         def normalize_line_width(amount):
             return 2
@@ -230,22 +238,27 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
             lon=[r['o_lon'], r['d_lon'] + random.uniform(-1.5, 1.5)],
             lat=[r['o_lat'], r['d_lat'] + random.uniform(-1.5, 1.5)],
             mode='lines+markers',
-            line=dict(width=normalize_line_width(r['amount']), color=country_color.get(r['origin_iso_a3'], 'black')),
+            line=dict(
+                width=normalize_line_width(r['amount']), 
+                color=country_color.get(r['origin_iso_a3'], '#2c3e50'),
+                dash='solid'
+            ),
             marker=dict(
                 size=[0, normalize_marker_size(r['amount'])],
-                symbol=['circle', 'triangle-up'],
-                color=['blue', country_color.get(r['origin_iso_a3'], 'black')],
-                line=dict(width=[0, 0])
+                symbol=['circle', 'triangle-right'],
+                color=country_color.get(r['origin_iso_a3'], '#2c3e50'),
+                line=dict(width=1, color=country_color.get(r['origin_iso_a3'], '#2c3e50')),
+                angleref='previous'
             ),
             opacity=0.7,
             hoverinfo='text',
             text=[
-                f"Origin: {r['origin_iso_a3']} ({gdf_countries.set_index('iso_a3').loc[r['origin_iso_a3'], 'admin']})<br>"
-                f"Destination: {r['dest_iso_a3']} ({gdf_countries.set_index('iso_a3').loc[r['dest_iso_a3'], 'admin']})<br>"
-                f"Flow: -{r['amount']/1e6:.1f} Millions (USD)",
-                f"Origin: {r['origin_iso_a3']} ({gdf_countries.set_index('iso_a3').loc[r['origin_iso_a3'], 'admin']})<br>"
-                f"Destination: {r['dest_iso_a3']} ({gdf_countries.set_index('iso_a3').loc[r['dest_iso_a3'], 'admin']})<br>"
-                f"Flow: +{r['amount']/1e6:.1f} Millions (USD)"
+                f"<b>{gdf_countries.set_index('iso_a3').loc[r['origin_iso_a3'], 'admin']}</b><br>"
+                f"→ {gdf_countries.set_index('iso_a3').loc[r['dest_iso_a3'], 'admin']}<br>"
+                f"<b>Outflow:</b> ${r['amount']/1e6:.2f}M USD",
+                f"<b>{gdf_countries.set_index('iso_a3').loc[r['origin_iso_a3'], 'admin']}</b><br>"
+                f"→ <b>{gdf_countries.set_index('iso_a3').loc[r['dest_iso_a3'], 'admin']}</b><br>"
+                f"<span style='color: #27ae60;'><b>Inflow:</b> ${r['amount']/1e6:.2f}M USD</span>"
             ],
             name=origin_name,
             legendgroup=origin_name,
@@ -272,15 +285,15 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
         except Exception:
             admin_name = iso
 
-        color = country_color.get(iso, None) or country_name_color.get(admin_name, None) or 'black'
+        color = country_color.get(iso, None) or country_name_color.get(admin_name, None) or '#34495e'
 
         legend_traces.append(go.Scattergeo(
             lon=[None], lat=[None],
             mode='markers',
-            marker=dict(size=12, color=color),
+            marker=dict(size=14, color=color, line=dict(width=1.5, color='white')),
             name=admin_name,
             legendgroup=admin_name,
-            text=f"Send by {admin_name}",
+            text=f"Flows from {admin_name}",
             showlegend=True
         ))
 
@@ -291,20 +304,29 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
     # --- Interactive legend for controlling arrow visibility ---
     fig.update_layout(
         legend=dict(
-            title=dict(text="<b>Arrow legend (Click to Hide/Show)</b>", font=dict(size=15, color="#000000")),
+            title=dict(
+                text="<b>Transaction Origins</b><br><sub>(Click to Hide/Show)</sub>", 
+                font=dict(size=14, color="#1a1a1a", family="Arial")
+            ),
             orientation="v",
             yanchor="top",
-            y=0.98,
+            y=0.88,
             xanchor="left",
             x=0.01,
-            bgcolor="rgba(255,255,255,0.85)",
+            bgcolor="rgba(255,255,255,0.95)",
+            bordercolor="#cccccc",
+            borderwidth=2,
             itemclick="toggle",
             itemdoubleclick="toggleothers",
-            traceorder='normal'
-        )
+            traceorder='normal',
+            font=dict(size=12, color="#333333")
+        ),
+        paper_bgcolor='#f8f9fa',
+        plot_bgcolor='#f8f9fa',
+        font=dict(family="Arial, sans-serif")
     )
 
-    # --- Geo layout ---
+    # --- Enhanced geo layout ---
     fig.update_geos(
         projection_type='natural earth',
         showcountries=True,
@@ -312,11 +334,14 @@ def make_transaction_arrow_map(flows, gdf_countries, selected_date, total, min_a
         showland=True,
         showocean=True,
         showlakes=True,
-        oceancolor="#82C0FF",
-        lakecolor="#82C0FF",
-        landcolor="#C2A580",
-        coastlinecolor="#A0A0A0",
-        resolution=110
+        oceancolor="#b3d9ff",
+        lakecolor="#b3d9ff",
+        landcolor="#e8e8e8",
+        coastlinecolor="#7f8c8d",
+        countrycolor='#bdc3c7',
+        countrywidth=0.5,
+        resolution=110,
+        bgcolor='#f8f9fa'
     )
 
     return fig, flows
@@ -466,7 +491,7 @@ def create_country_popup(country, ratio, data, clean_data_illegal):
     return f"""
     <div style="width: 350px;">
         <h4 style="margin: 0 0 10px 0; color: #2c3e50;">{country}</h4>
-        <p><strong>Illegal Transaction Ratio:</strong> {ratio:.2%}</p>
+        <p><strong>Illegal Reported Ratio:</strong> {ratio:.2%}</p>
         <p><strong>Total Transactions:</strong> {count_str}</p>
         <p><strong>Total Amount:</strong> {amount_str}</p>
         {transaction_breakdown}

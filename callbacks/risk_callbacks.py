@@ -184,6 +184,6 @@ def register_risk_callbacks(app):
             n_clicks = 0
         
         if n_clicks % 2 == 1:
-            return "📊 Show All Points", "success"
+            return " Show All Points", "success"
         else:
-            return "🎯 Reduce Samples", "warning"
+            return " Reduce Samples", "warning"

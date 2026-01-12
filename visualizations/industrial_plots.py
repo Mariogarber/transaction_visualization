@@ -59,8 +59,8 @@ def _normalize_color_for_plotly(color):
         return color
 
     c = color.strip()
-    # #RRGGBBAA -> rgba(...)
-    if c.startswith('#') and len(c) == 9:  # including '#'
+
+    if c.startswith('#') and len(c) == 9:
         try:
             r = int(c[1:3], 16)
             g = int(c[3:5], 16)
@@ -68,17 +68,17 @@ def _normalize_color_for_plotly(color):
             a = int(c[7:9], 16) / 255.0
             return f'rgba({r},{g},{b},{a:.3f})'
         except Exception:
-            return c  # fallback, return as is
-    # short hex #RGB -> expand to #RRGGBB
+            return c
+        
     if c.startswith('#') and len(c) == 4:
         r = c[1]*2
         g = c[2]*2
         b = c[3]*2
         return f'#{r}{g}{b}'
-    # #RRGGBB -> ok
+    
     if c.startswith('#') and len(c) == 7:
         return c
-    # already rgb(...) or rgba(...) or named color -> return as is
+
     return c
 
 # --- SARIMA predictor plot ---
@@ -100,7 +100,7 @@ def make_sarima_predictor_figure(dataset, selected_country, selected_industries,
     # If not enough data, return empty fig
     if len(ts) < 10:
         return go.Figure(layout={"title": "Not enough data for SARIMA prediction."})
-    # Fit SARIMA (simple order, can be improved)
+    # Fit SARIMA
     try:
         model = SARIMAX(ts, order=(1,1,1), seasonal_order=(1,1,1,7), enforce_stationarity=False, enforce_invertibility=False)
         results = model.fit(disp=False)
@@ -119,7 +119,7 @@ def make_sarima_predictor_figure(dataset, selected_country, selected_industries,
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=train_x, y=train_y, mode='lines+markers', name='Train Data'))
     fig.add_trace(go.Scatter(x=forecast_series.index, y=forecast_series.values, mode='lines+markers', name='Forecast'))
-    # Add confidence interval (clipped)
+    # Add confidence interval
     fig.add_traces([
         go.Scatter(
             x=forecast_index,
@@ -525,7 +525,6 @@ def make_transaction_over_time(dataset, iso_a3_dict, selected_industries, countr
     if not scatter_data.empty:
         total_amounts = scatter_data['Spend Amount (USD)'] + scatter_data['Receive Amount (USD)']
         if total_amounts.max() > 0:
-            # Normalize to range 8-40 for better visibility
             min_size, max_size = 8, 40
             normalized_sizes = min_size + (max_size - min_size) * (total_amounts / total_amounts.max())
         else:
@@ -556,7 +555,7 @@ def make_transaction_over_time(dataset, iso_a3_dict, selected_industries, countr
             ),
             name=dest_country,
             legendgroup=dest_country,
-            showlegend=False,  # Don't duplicate
+            showlegend=False,
         ), row=2, col=2)
 
         if dest_country not in countries_seen:

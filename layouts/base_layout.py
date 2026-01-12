@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 def create_main_layout():
     """Create the main landing page with project explanation and navigation buttons"""
     return html.Div([
-        # Navigation bar (so nav-main exists in layout)
+        # Navigation bar
         create_navigation_bar('main'),
 
         # Header

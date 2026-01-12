@@ -108,6 +108,8 @@ def create_industrial_layout(data):
                 ], style={'marginBottom': '20px'}),
 
                 html.Label("Window Size for Moving Average:", style={'fontWeight': '700', 'marginBottom': '15px', 'fontSize': '18px'}),
+                html.Div("Adjust the slider to set the window size for the moving average calculation. A larger window smooths out short-term fluctuations, revealing longer-term trends in transaction volumes.",
+                         style={'fontSize': '14px', 'color': '#6c757d', 'marginBottom': '10px'}),
                 dcc.Slider(
                     id='window-size-slider',
                     min=1, max=25, step=1, value=5,

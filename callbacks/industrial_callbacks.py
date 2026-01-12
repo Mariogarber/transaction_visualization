@@ -54,7 +54,6 @@ def register_industrial_callbacks(app):
         if n_clicks and last_n_clicks is not None and n_clicks > last_n_clicks:
             from visualizations.industrial_plots import make_sarima_predictor_figure
             return make_sarima_predictor_figure(data, selected_country, selected_industries, train_start, train_end, forecast_periods), n_clicks
-        # If widgets changed, reset store to current n_clicks (so next click triggers SARIMA)
         return fig, n_clicks
     
     @app.callback(
@@ -66,7 +65,7 @@ def register_industrial_callbacks(app):
         """Toggle the normalize button state"""
         if not n_clicks:
             n_clicks = 0
-        label = "🔄 Denormalize" if (n_clicks % 2 == 1) else "🔄 Normalize"
+        label = " Denormalize" if (n_clicks % 2 == 1) else " Normalize"
         color = "success" if (n_clicks % 2 == 1) else "primary"
         return label, color
 
@@ -74,19 +73,13 @@ def register_industrial_callbacks(app):
         Output('industry-bar-chart', 'figure'),
         Input('country-dropdown', 'value'),
         Input('normalize-button', 'n_clicks'),
-        Input('date-range-picker-industrial', 'start_date'),
-        Input('date-range-picker-industrial', 'end_date')
     )
-    def build_industry_fig(selected_country, normalize_clicks, start_date, end_date):
+    def build_industry_fig(selected_country, normalize_clicks):
         """Build industry bar chart with optional filtering and normalization"""
         data_manager = app.data_manager
         data = data_manager.get_data()
         
-        # Filter by date range
-        if start_date and end_date:
-            filtered_data = data_manager.filter_data_by_date_and_country(start_date, end_date, [selected_country])
-        else:
-            filtered_data = data[data['Country'] == selected_country]
+        filtered_data = data[data['Country'] == selected_country]
         
         return make_stacked_illegal_legal(selected_country, normalize_clicks or 0, filtered_data)
 

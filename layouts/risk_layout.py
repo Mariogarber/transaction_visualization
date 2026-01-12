@@ -7,6 +7,7 @@ from layouts.base_layout import create_navigation_bar
 
 
 def create_risk_layout(data):
+
     # Shell Companies Network Graph section
     shell_network_section = html.Div([
         html.H2("Shell Companies Network Graph", style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
@@ -50,7 +51,7 @@ def create_risk_layout(data):
                     pushable=1000,
                     updatemode='mouseup',
                 ),
-                html.Div("Note: Only the first 200 transactions in the selected range will be shown for performance.", style={'fontSize': '12px', 'color': '#888', 'marginTop': '5px'})
+                html.Div("Note: Only the first 250 transactions in the selected range will be shown for performance.", style={'fontSize': '12px', 'color': '#888', 'marginTop': '5px'})
             ], width=4),
             dbc.Col([
                 html.Label("Number of Transactions to Show (max 250):", style={'fontWeight': '600', 'fontSize': '16px', 'marginBottom': '5px'}),
@@ -89,7 +90,6 @@ def create_risk_layout(data):
         )
     ], style={'marginBottom': '50px', 'backgroundColor': '#f8f9fa', 'padding': '30px', 'borderRadius': '10px'})
 
-    # Now return the layout including the network section
     return html.Div([
         create_navigation_bar('risk'),
         html.Div([
