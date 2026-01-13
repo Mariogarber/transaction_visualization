@@ -62,6 +62,11 @@ def create_main_layout():
             }
             ),
 
+            html.P([
+                "Disclaimer: This dataset contains synthetic data created for educational and analytical purposes. ",
+                "Any patterns or insights derived from this dashboard do not reflect real-world transactions."
+            ]),
+            
             html.H3("Dataset Columns & Meanings", style={'textAlign': 'center', 'marginTop': '30px', 'marginBottom': '20px', 'fontSize': '28px', 'fontWeight': '700', 'color': '#2c3e50'}),
             html.Table([
                 html.Thead([

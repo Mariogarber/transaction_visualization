@@ -440,7 +440,7 @@ def make_shell_companies_analysis(dataset):
         row=2, col=1
     )
     
-    # 4. Shell company usage rate (shell companies per transaction)
+    # 4. Shell company usage rate
     legal_rate = (shell_total['Legal'] / count_trans['Legal']).fillna(0) if 'Legal' in shell_total.columns else [0]*len(industries)
     illegal_rate = (shell_total['Illegal'] / count_trans['Illegal']).fillna(0) if 'Illegal' in shell_total.columns else [0]*len(industries)
     
