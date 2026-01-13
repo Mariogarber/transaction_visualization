@@ -1,5 +1,6 @@
 import dash_cytoscape as cyto
 import pandas as pd
+from dash import html
 
 def make_shell_network_elements(dataset, risk_range=(0, 10)):
     # Filter for transactions with shell companies and risk range

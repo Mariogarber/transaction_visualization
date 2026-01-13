@@ -47,13 +47,86 @@ def register_risk_callbacks(app):
         elements, stylesheet = make_shell_network_elements(dataset, risk_range)
         if not elements:
             return html.Div("No network data for selected filters.", style={'textAlign': 'center', 'color': '#888', 'fontSize': '18px', 'margin': '30px'})
-        return cyto.Cytoscape(
-            id='shell-network-graph',
-            elements=elements,
-            layout={'name': 'cose'},
-            stylesheet=stylesheet,
-            style={'width': '100%', 'height': '600px', 'background': '#f8f9fa', 'borderRadius': '10px', 'boxShadow': '0 2px 8px rgba(0,0,0,0.05)'}
-        )
+        
+        # Create legend
+        legend = html.Div([
+            html.Div("Legend", style={
+                'fontSize': '18px',
+                'fontWeight': 'bold',
+                'marginBottom': '10px',
+                'color': '#34495e'
+            }),
+            html.Div([
+                html.Div([
+                    html.Div(style={
+                        'width': '15px',
+                        'height': '15px',
+                        'borderRadius': '50%',
+                        'backgroundColor': '#2980b9',
+                        'display': 'inline-block',
+                        'marginRight': '10px'
+                    }),
+                    html.Span("Person Involved", style={'fontSize': '14px', 'color': '#5a6c7d'})
+                ], style={'marginBottom': '8px', 'display': 'flex', 'alignItems': 'center'}),
+                html.Div([
+                    html.Div(style={
+                        'width': '15px',
+                        'height': '15px',
+                        'borderRadius': '50%',
+                        'backgroundColor': '#e67e22',
+                        'display': 'inline-block',
+                        'marginRight': '10px'
+                    }),
+                    html.Span("Shell Company", style={'fontSize': '14px', 'color': '#5a6c7d'})
+                ], style={'marginBottom': '8px', 'display': 'flex', 'alignItems': 'center'}),
+                html.Div([
+                    html.Div(style={
+                        'width': '15px',
+                        'height': '15px',
+                        'borderRadius': '50%',
+                        'backgroundColor': '#27ae60',
+                        'display': 'inline-block',
+                        'marginRight': '10px'
+                    }),
+                    html.Span("Country", style={'fontSize': '14px', 'color': '#5a6c7d'})
+                ], style={'marginBottom': '8px', 'display': 'flex', 'alignItems': 'center'}),
+                html.Div([
+                    html.Div("→", style={
+                        'fontSize': '18px',
+                        'display': 'inline-block',
+                        'marginRight': '10px',
+                        'color': '#34495e',
+                        'fontWeight': 'bold'
+                    }),
+                    html.Span("Transaction Flow", style={'fontSize': '14px', 'color': '#5a6c7d'})
+                ], style={'marginBottom': '8px', 'display': 'flex', 'alignItems': 'center'}),
+            ])
+        ], style={
+            'position': 'absolute',
+            'top': '10px',
+            'right': '10px',
+            'backgroundColor': 'rgba(255, 255, 255, 0.95)',
+            'padding': '15px',
+            'borderRadius': '8px',
+            'boxShadow': '0 2px 8px rgba(0,0,0,0.15)',
+            'zIndex': '1000',
+            'border': '1px solid #e0e6ed'
+        })
+        
+        return html.Div([
+            legend,
+            cyto.Cytoscape(
+                id='shell-network-graph',
+                elements=elements,
+                layout={'name': 'cose'},
+                stylesheet=stylesheet,
+                style={'width': '100%', 'height': '600px', 'background': '#f8f9fa', 'borderRadius': '10px', 'boxShadow': '0 2px 8px rgba(0,0,0,0.05)'},
+                minZoom=0.3,
+                maxZoom=3,
+                zoom=1,
+                pan={'x': 0, 'y': 0}
+            )
+        ], style={'position': 'relative'})
     
     @app.callback(
         Output('risk-distribution-plot', 'figure'),
@@ -93,9 +166,8 @@ def register_risk_callbacks(app):
         # Filter by selected industries
         if selected_industries:
             dataset = dataset[dataset['Industry'].isin(selected_industries)]
-        
-        # Determine if clustering is enabled
-        use_clustering = clustering_clicks and (clustering_clicks % 2 == 1)
+
+        use_clustering = not clustering_clicks or (clustering_clicks % 2 == 1)
         
         return make_transaction_amount_analysis(dataset, use_clustering)
 

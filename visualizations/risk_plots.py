@@ -574,7 +574,9 @@ def make_tax_haven_flow_analysis(dataset):
         title_text='<b>Money Flow Analysis: Source Countries → Destinations → Tax Havens</b>',
         title_x=0.5,
         font_size=10,
-        height=700
+        height=700,
+        plot_bgcolor='rgba(248, 249, 250, 0.9)',
+        paper_bgcolor='rgba(248, 249, 250, 0.9)'
     )
     
     return fig

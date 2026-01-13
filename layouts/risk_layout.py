@@ -122,11 +122,12 @@ def create_risk_layout(data):
             
                 # Transaction Amount Analysis
                 html.Div([
-                html.H2(" Transaction Amount vs Risk Analysis", 
-                    style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
-                html.P("Scatter plot showing how transaction amounts relate to risk scores and other factors. Use industry selection to focus the analysis.",
-                      style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
-                
+                    html.H2(" Transaction Amount vs Risk Analysis", 
+                        style={'fontSize': '32px', 'fontWeight': '600', 'color': '#34495e', 'marginBottom': '20px'}),
+                    html.P("Scatter plot showing how transaction amounts relate to risk scores and other factors. Use industry selection to focus the analysis.",
+                        style={'fontSize': '16px', 'color': '#7f8c8d', 'marginBottom': '20px'}),
+                    html.P("Use this Scatter plot to identigy trends and outliers in transaction amounts relative to their associated risk scores. By selecting specific industries, you can focus on sectors that may exhibit higher risk patterns, helping to pinpoint areas that require further investigation.",
+                        style={'fontSize': '14px', 'color': '#95a5a6', 'marginBottom': '20px'}),    
                 # Industry Selection Panel
                 html.Div([
                     html.Label(" Select Industries to Analyze:", 
@@ -137,7 +138,7 @@ def create_risk_layout(data):
                             {'label': f' {industry}', 'value': industry} 
                             for industry in sorted(data['Industry'].unique())
                         ],
-                        value=sorted(data['Industry'].unique()),  # All selected by default
+                        value=[sorted(data['Industry'].unique())[0]],  # Default to first industry
                         inline=True,
                         style={'marginBottom': '20px'},
                         inputStyle={'marginRight': '8px'},
@@ -161,9 +162,10 @@ def create_risk_layout(data):
                         dbc.Button(
                             "Reduce Samples", 
                             id="toggle-clustering-risk", 
-                            color="warning", 
+                            color="success", 
                             size="sm",
-                            style={'marginLeft': '20px'}
+                            style={'marginLeft': '20px'},
+                            n_clicks=1
                         )
                     ], style={'marginBottom': '20px'})
                 ], style={
