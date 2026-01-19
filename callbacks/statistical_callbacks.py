@@ -11,6 +11,7 @@ from visualizations.statistical_plots import (
     make_summary_statistics_table
 )
 from visualizations.industrial_plots import make_industry_bar_figure
+import plotly.graph_objects as go
 
 
 def register_statistical_callbacks(app):
@@ -80,7 +81,6 @@ def register_statistical_callbacks(app):
         filtered_data = data_manager.filter_data_by_date_and_country(start_date, end_date, selected_countries)
         
         if filtered_data.empty:
-            import plotly.graph_objects as go
             fig = go.Figure()
             fig.add_annotation(
                 text="No data available for the selected filters",
@@ -104,7 +104,6 @@ def register_statistical_callbacks(app):
         filtered_data = data_manager.filter_data_by_date_and_country(start_date, end_date, selected_countries)
         
         if filtered_data.empty:
-            import plotly.graph_objects as go
             fig = go.Figure()
             fig.add_annotation(
                 text="No data available for the selected filters",
@@ -128,7 +127,6 @@ def register_statistical_callbacks(app):
         filtered_data = data_manager.filter_data_by_date_and_country(start_date, end_date, selected_countries)
         
         if filtered_data.empty:
-            import plotly.graph_objects as go
             fig = go.Figure()
             fig.add_annotation(
                 text="No data available for the selected filters",
@@ -152,7 +150,6 @@ def register_statistical_callbacks(app):
         filtered_data = data_manager.filter_data_by_date_and_country(start_date, end_date, selected_countries)
         
         if filtered_data.empty:
-            import plotly.graph_objects as go
             fig = go.Figure()
             fig.add_annotation(
                 text="No data available for the selected filters",

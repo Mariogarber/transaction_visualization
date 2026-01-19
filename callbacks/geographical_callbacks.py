@@ -9,6 +9,7 @@ from visualizations.geographical_plots import (
     make_transaction_arrow_map,
     make_risk_score_choropleth_map
 )
+import plotly.graph_objects as go
 
 
 def register_geographical_callbacks(app):
@@ -69,7 +70,6 @@ def register_geographical_callbacks(app):
             filtered_data = data_manager.get_data()
         
         if filtered_data.empty:
-            import plotly.graph_objects as go
             fig = go.Figure()
             fig.add_annotation(
                 text="No data available for the selected date range",

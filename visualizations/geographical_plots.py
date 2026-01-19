@@ -449,10 +449,6 @@ def create_country_popup(country, ratio, data, clean_data_illegal):
             chart_html = ""
             if data and len(data) > 0:
                 try:
-                    import matplotlib.pyplot as plt
-                    import io
-                    import base64
-                    
                     # Create pie chart
                     fig, ax = plt.subplots(figsize=(4, 3))
                     labels = list(data.keys())

@@ -9,6 +9,7 @@ from visualizations.risk_plots import (
     make_shell_companies_analysis,
     make_tax_haven_flow_analysis
 )
+import plotly.graph_objects as go
 
 
 def register_risk_callbacks(app):
@@ -141,7 +142,6 @@ def register_risk_callbacks(app):
         dataset = data_manager.get_data()
         
         if dataset.empty:
-            import plotly.graph_objects as go
             fig = go.Figure()
             fig.add_annotation(
                 text="No data available",
@@ -185,7 +185,6 @@ def register_risk_callbacks(app):
             dataset = dataset[dataset['Industry'].isin(selected_industries)]
         
         if dataset.empty:
-            import plotly.graph_objects as go
             fig = go.Figure()
             fig.add_annotation(
                 text="No data available for selected industries",
@@ -211,7 +210,6 @@ def register_risk_callbacks(app):
             dataset = dataset[dataset['Industry'].isin(selected_industries)]
         
         if dataset.empty:
-            import plotly.graph_objects as go
             fig = go.Figure()
             fig.add_annotation(
                 text="No data available for selected industries",

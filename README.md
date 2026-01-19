@@ -1,4 +1,4 @@
-# 💰 Transaction Visualization Dashboard
+#  Transaction Visualization Dashboard
 
 An interactive web-based dashboard for analyzing financial transaction patterns, detecting suspicious activities, and visualizing money flows across countries and industries.
 
@@ -25,6 +25,11 @@ python app.py
 ```
 
 Access the dashboard at: **http://localhost:8080**
+
+
+### Web Access
+
+To access to the dashboard without running it, you can use this deploy: https://transactionvisualization-production.up.railway.app/
 
 ---
 

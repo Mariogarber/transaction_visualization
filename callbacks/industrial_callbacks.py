@@ -7,12 +7,16 @@ from data.data_manager import DataManager
 from visualizations.industrial_plots import (
     make_industry_bar_figure,
     make_stacked_illegal_legal,
-    make_transaction_over_time
+    make_transaction_over_time,
+    make_sarima_predictor_figure
 )
+
+from dash.dependencies import State
+import plotly.graph_objects as go
+import pandas as pd
 
 
 def register_industrial_callbacks(app):
-    from dash.dependencies import State
     @app.callback(
         Output('sarima-predictor-graph', 'figure'),
         Output('sarima-nclicks-store', 'data'),
@@ -31,8 +35,7 @@ def register_industrial_callbacks(app):
             return {"layout": {"title": "Select all parameters for SARIMA prediction."}}, n_clicks
         if isinstance(selected_industries, str):
             selected_industries = [selected_industries]
-        import plotly.graph_objects as go
-        import pandas as pd
+
         # Always show the train time series
         df = data.copy()
         df = df[(df['Country'] == selected_country) & (df['Industry'].isin(selected_industries))]
@@ -52,7 +55,6 @@ def register_industrial_callbacks(app):
         )
         # Only run SARIMA if button pressed and n_clicks increased
         if n_clicks and last_n_clicks is not None and n_clicks > last_n_clicks:
-            from visualizations.industrial_plots import make_sarima_predictor_figure
             return make_sarima_predictor_figure(data, selected_country, selected_industries, train_start, train_end, forecast_periods), n_clicks
         return fig, n_clicks
     

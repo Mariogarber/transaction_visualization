@@ -10,6 +10,7 @@ from dash import dash_table
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import LabelEncoder
 
 
 # Color mappings
@@ -188,7 +189,6 @@ def make_correlation_analysis(dataset):
     numeric_cols = ['Amount (USD)', 'Money Laundering Risk Score', 'Is_Illegal']
     
     # Encode categorical variables
-    from sklearn.preprocessing import LabelEncoder
     le_country = LabelEncoder()
     le_industry = LabelEncoder()
     le_transaction = LabelEncoder()
