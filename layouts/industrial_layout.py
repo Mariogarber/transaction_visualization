@@ -169,7 +169,7 @@ def create_industrial_layout(data):
                         )
                     ], width=3),
                     dbc.Col([
-                        html.Label("# Predictions:", style={'fontWeight': '700', 'marginBottom': '10px', 'fontSize': '18px'}),
+                        html.Label("Nº Predictions:", style={'fontWeight': '700', 'marginBottom': '10px', 'fontSize': '18px'}),
                         dcc.Input(
                             id='sarima-prediction-periods',
                             type='number',

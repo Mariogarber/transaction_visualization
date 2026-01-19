@@ -551,7 +551,8 @@ def make_tax_haven_flow_analysis(dataset):
         source_indices.append(source_idx)
         target_indices.append(target_idx)
         values.append(row['Amount (USD)'])
-        link_colors.append('rgba(231, 76, 60, 0.3)')
+        color_opacity = min(0.8, 0.1 + (row['Amount (USD)'] - flow_data['Amount (USD)'].min()) / (flow_data['Amount (USD)'].max() - flow_data['Amount (USD)'].min()) * 0.1)
+        link_colors.append(f'rgba(231, 76, 60, {color_opacity})')
     
     # Create Sankey diagram
     fig = go.Figure(data=[go.Sankey(
